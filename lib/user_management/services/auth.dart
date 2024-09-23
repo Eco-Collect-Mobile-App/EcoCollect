@@ -90,6 +90,11 @@ class AuthServices {
     return user?.email;
   }
 
+  // Method to get UID as Future
+  Future<String?> getUserUid() async {
+    return _auth.currentUser?.uid;
+  }
+
   //sign out
   Future signOut() async {
     try {
