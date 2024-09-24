@@ -1,21 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:eco_collect/service/firebase_service.dart';
-import 'package:eco_collect/pages/pickupReqHistory.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // Import FirebaseAuth to get the current user
+import 'package:firebase_auth/firebase_auth.dart';
 
-class PickupRequest extends StatefulWidget {
+class PickupReqUpdate extends StatefulWidget {
+  final String requestId; // Pass the existing request ID to update
+  final Map<String, dynamic>
+      existingData; // New parameter to hold existing data
+
+  const PickupReqUpdate({
+    Key? key,
+    required this.requestId,
+    required this.existingData, // Accept existing data
+  }) : super(key: key);
+
   @override
-  _PickupRequestState createState() => _PickupRequestState();
+  _PickupReqUpdateState createState() => _PickupReqUpdateState();
 }
 
-class _PickupRequestState extends State<PickupRequest> {
+class _PickupReqUpdateState extends State<PickupReqUpdate> {
   final _formKey = GlobalKey<FormState>();
 
   // Create an instance of FirebaseService
   final FirebaseService _firebaseService = FirebaseService();
-
-  // User input controllers
+  // Controllers for form fields
   TextEditingController userIdController = TextEditingController();
   TextEditingController pickupDateController = TextEditingController();
   TextEditingController pickupTimeController = TextEditingController();
@@ -23,39 +31,42 @@ class _PickupRequestState extends State<PickupRequest> {
   DateTime selectedDate = DateTime.now();
   TimeOfDay selectedTime = TimeOfDay.now();
 
-  // Waste types and counts (weight is null by default)
-  List<Map<String, dynamic>> wasteEntries = [
-    {
-      "wasteType": null,
-      "bagCount": null,
-      "weight": null // This will be sent as null
-    }
-  ];
+  List<Map<String, dynamic>> wasteEntries = [];
 
   final List<String> wasteTypes = ["Organic", "Plastic", "Recyclable", "Other"];
 
   @override
   void initState() {
     super.initState();
-    _setUserId(); // Call the function to set the current user ID
+    _setUserId();
+    _loadExistingData(); // Load the existing request data
   }
 
-  // Function to get the current user's UID and set it to userIdController
+  // Function to get the current user's UID
   void _setUserId() async {
-    User? user =
-        FirebaseAuth.instance.currentUser; // Get the current logged-in user
+    User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       setState(() {
-        userIdController.text = user.uid; // Set the uid to the controller
+        userIdController.text = user.uid;
       });
     }
+  }
+
+  // Function to load existing data from the passed existingData
+  void _loadExistingData() {
+    setState(() {
+      pickupDateController.text = widget.existingData['pickupDate'] ?? '';
+      pickupTimeController.text = widget.existingData['pickupTime'] ?? '';
+      wasteEntries = List<Map<String, dynamic>>.from(
+          widget.existingData['wasteEntries'] ?? []);
+    });
   }
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: selectedDate,
-      firstDate: DateTime.now(), // Disable past dates
+      firstDate: DateTime.now(),
       lastDate: DateTime(2100),
     );
     if (picked != null && picked != selectedDate) {
@@ -87,44 +98,30 @@ class _PickupRequestState extends State<PickupRequest> {
 
   Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
-      // Collect the form data
       String userId = userIdController.text;
       String pickupDate = pickupDateController.text;
       String pickupTime = pickupTimeController.text;
 
       try {
-        // Use the FirebaseService to add data to Firestore
-        await _firebaseService.addWasteData(
+        // Update the data in Firestore
+        await _firebaseService.updateWasteData(
+          requestId: widget.requestId,
           userId: userId,
           pickupDate: pickupDate,
           pickupTime: pickupTime,
           wasteEntries: wasteEntries,
         );
 
-        // Clear the form
-        pickupDateController.clear();
-        pickupTimeController.clear();
-        setState(() {
-          wasteEntries = [
-            {"wasteType": null, "bagCount": null, "weight": null}
-          ];
-        });
-
-        // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Form Submitted Successfully')),
+          const SnackBar(content: Text('Form Updated Successfully')),
         );
 
-        // Navigate to the pickup request history page
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => PickupReqHistory()),
-        );
+        Navigator.pop(context); // Navigate back after updating
       } catch (e, stackTrace) {
-        print('Failed to submit form: $e');
+        print('Failed to update form: $e');
         print('Stack trace: $stackTrace');
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to Submit Form: $e')),
+          SnackBar(content: Text('Failed to Update Form: $e')),
         );
       }
     }
@@ -134,7 +131,7 @@ class _PickupRequestState extends State<PickupRequest> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Pickup Request"),
+        title: Text("Update Pickup Request"),
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0),
@@ -144,7 +141,7 @@ class _PickupRequestState extends State<PickupRequest> {
             children: [
               TextFormField(
                 controller: userIdController,
-                readOnly: true, // Make the field read-only
+                readOnly: true,
                 decoration: InputDecoration(labelText: 'User ID'),
               ),
               TextFormField(
@@ -193,7 +190,6 @@ class _PickupRequestState extends State<PickupRequest> {
                 itemBuilder: (context, index) {
                   return Row(
                     children: [
-                      // Waste Type Dropdown
                       Expanded(
                         child: DropdownButtonFormField<String>(
                           value: wasteEntries[index]["wasteType"],
@@ -220,12 +216,12 @@ class _PickupRequestState extends State<PickupRequest> {
                         ),
                       ),
                       SizedBox(width: 10),
-
-                      // Bag Count TextField
                       Expanded(
                         child: TextFormField(
                           keyboardType: TextInputType.number,
                           decoration: InputDecoration(labelText: 'No. of Bags'),
+                          initialValue:
+                              wasteEntries[index]["bagCount"]?.toString(),
                           onChanged: (value) {
                             setState(() {
                               wasteEntries[index]["bagCount"] =
@@ -254,7 +250,7 @@ class _PickupRequestState extends State<PickupRequest> {
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _submitForm,
-                child: Text('Submit'),
+                child: Text('Update'),
               ),
             ],
           ),
