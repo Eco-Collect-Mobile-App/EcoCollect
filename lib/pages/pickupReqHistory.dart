@@ -4,16 +4,40 @@ import 'package:eco_collect/service/firebase_service.dart';
 import 'package:eco_collect/pages/pickupReqDelete.dart'; // Ensure this page exists
 import 'package:eco_collect/pages/pickupReqUpdate.dart'; // Ensure this page exists
 
-class PickupReqHistory extends StatelessWidget {
-  final FirebaseService _firebaseService = FirebaseService();
+class PickupReqHistory extends StatefulWidget {
+  @override
+  _PickupReqHistoryState createState() => _PickupReqHistoryState();
+}
 
-  PickupReqHistory({super.key});
+class _PickupReqHistoryState extends State<PickupReqHistory> {
+  final FirebaseService _firebaseService = FirebaseService();
+  String searchKeyword = '';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Garbage Pick-up Requests"),
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(56.0),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: TextField(
+              onChanged: (value) {
+                setState(() {
+                  searchKeyword =
+                      value.toLowerCase(); // Update the search keyword
+                });
+              },
+              decoration: InputDecoration(
+                hintText: "Search by waste type or date...",
+                border: OutlineInputBorder(),
+                filled: true,
+                fillColor: Colors.white,
+              ),
+            ),
+          ),
+        ),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: _firebaseService.getWasteRequestsForUser(),
@@ -30,9 +54,37 @@ class PickupReqHistory extends StatelessWidget {
             return Center(child: Text('No pickup requests found.'));
           }
 
-          // Display the data in a ListView
+          // Filter the data based on the search keyword
+          final filteredDocs =
+              snapshot.data!.docs.where((DocumentSnapshot document) {
+            Map<String, dynamic> data =
+                document.data()! as Map<String, dynamic>;
+
+            // Check if the search keyword matches pickupDate, pickupTime, or any wasteType in wasteEntries
+            bool matchesPickupDate = (data['pickupDate'] ?? '')
+                .toLowerCase()
+                .contains(searchKeyword);
+            bool matchesPickupTime = (data['pickupTime'] ?? '')
+                .toLowerCase()
+                .contains(searchKeyword);
+
+            // Ensure wasteEntries is a list and check for matches
+            bool matchesWasteEntries = (data['wasteEntries'] is List)
+                ? (data['wasteEntries'] as List).any((entry) {
+                    return (entry['wasteType'] ?? '')
+                        .toLowerCase()
+                        .contains(searchKeyword);
+                  })
+                : false;
+
+            return matchesPickupDate ||
+                matchesPickupTime ||
+                matchesWasteEntries;
+          }).toList();
+
+          // Display the filtered data in a ListView
           return ListView(
-            children: snapshot.data!.docs.map((DocumentSnapshot document) {
+            children: filteredDocs.map((DocumentSnapshot document) {
               Map<String, dynamic> data =
                   document.data()! as Map<String, dynamic>;
 
