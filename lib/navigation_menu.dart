@@ -1,6 +1,7 @@
 import 'package:eco_collect/pages/complaints.dart';
-import 'package:eco_collect/pages/dashboard.dart';
 import 'package:eco_collect/pages/profile.dart';
+import 'package:eco_collect/pages/dashboard.dart';
+import 'package:eco_collect/pages/datachart.dart';
 import 'package:eco_collect/pages/schedule.dart';
 import 'package:eco_collect/pages/trucks.dart';
 import 'package:flutter/material.dart';
@@ -65,8 +66,8 @@ class NavigationController extends GetxController {
   final screens = [
     const Schedule(),
     const Trucks(),
+    const DataChart(),
     const Dashboard(),
-    const Complaints(),
     Profile(),
   ];
 }
