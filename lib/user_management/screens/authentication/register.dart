@@ -222,7 +222,8 @@ class _RegisterState extends State<Register> {
                                     addressNo,
                                     street,
                                     city);
-                            if (result == null) {
+
+                            if (result == null && mounted) {
                               setState(() {
                                 error = "Please enter a valid email";
                               });

@@ -9,6 +9,7 @@ import 'package:firebase_core/firebase_core.dart';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+//import 'navigation_menu.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,11 +23,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamProvider<UserModel?>.value(
-        initialData: UserModel(uid: ""),
-        value: AuthServices().user,
-        child: MaterialApp(
-          debugShowCheckedModeBanner: false,
-          home: Wrapper(),
-        ));
+      initialData: UserModel(uid: ""),
+      value: AuthServices().user,
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home:
+            Wrapper(), // Show the Wrapper, which handles navigation based on login state
+      ),
+    );
   }
 }
