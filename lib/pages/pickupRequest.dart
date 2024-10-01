@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:eco_collect/service/firebase_service.dart';
 import 'package:eco_collect/pages/pickupReqHistory.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // Import FirebaseAuth to get the current user
+import 'package:firebase_auth/firebase_auth.dart';
 
 class PickupRequest extends StatefulWidget {
   @override
@@ -17,6 +17,14 @@ class _PickupRequestState extends State<PickupRequest> {
 
   // User input controllers
   TextEditingController userIdController = TextEditingController();
+  TextEditingController nicController =
+      TextEditingController(); // New NIC controller
+  TextEditingController addressNoController =
+      TextEditingController(); // New address number controller
+  TextEditingController streetController =
+      TextEditingController(); // New street controller
+  TextEditingController cityController =
+      TextEditingController(); // New city controller
   TextEditingController pickupDateController = TextEditingController();
   TextEditingController pickupTimeController = TextEditingController();
 
@@ -25,11 +33,7 @@ class _PickupRequestState extends State<PickupRequest> {
 
   // Waste types and counts (weight is null by default)
   List<Map<String, dynamic>> wasteEntries = [
-    {
-      "wasteType": null,
-      "bagCount": null,
-      "weight": null // This will be sent as null
-    }
+    {"wasteType": null, "bagCount": null, "weight": null}
   ];
 
   final List<String> wasteTypes = ["Organic", "Plastic", "Recyclable", "Other"];
@@ -48,6 +52,16 @@ class _PickupRequestState extends State<PickupRequest> {
       setState(() {
         userIdController.text = user.uid; // Set the uid to the controller
       });
+
+      // Fetch user data (NIC and address) from Firestore
+      var userData = await _firebaseService.getUserData(user.uid);
+      if (userData != null) {
+        nicController.text = userData['nic'] ?? ''; // Set NIC
+        // Set address fields if available
+        addressNoController.text = userData['addressNo'] ?? ''; // Address No
+        streetController.text = userData['street'] ?? ''; // Street
+        cityController.text = userData['city'] ?? ''; // City
+      }
     }
   }
 
@@ -55,7 +69,7 @@ class _PickupRequestState extends State<PickupRequest> {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: selectedDate,
-      firstDate: DateTime.now(), // Disable past dates
+      firstDate: DateTime.now(),
       lastDate: DateTime(2100),
     );
     if (picked != null && picked != selectedDate) {
@@ -89,6 +103,12 @@ class _PickupRequestState extends State<PickupRequest> {
     if (_formKey.currentState!.validate()) {
       // Collect the form data
       String userId = userIdController.text;
+      String nic = nicController.text; // Get NIC
+
+      // Concatenate the address parts into a single string
+      String address =
+          '${addressNoController.text}, ${streetController.text}, ${cityController.text}';
+
       String pickupDate = pickupDateController.text;
       String pickupTime = pickupTimeController.text;
 
@@ -99,11 +119,17 @@ class _PickupRequestState extends State<PickupRequest> {
           pickupDate: pickupDate,
           pickupTime: pickupTime,
           wasteEntries: wasteEntries,
+          nic: nic, // Pass NIC
+          address: address, // Pass concatenated address
         );
 
         // Clear the form
         pickupDateController.clear();
         pickupTimeController.clear();
+        nicController.clear(); // Clear NIC
+        addressNoController.clear(); // Clear Address No
+        streetController.clear(); // Clear Street
+        cityController.clear(); // Clear City
         setState(() {
           wasteEntries = [
             {"wasteType": null, "bagCount": null, "weight": null}
@@ -144,8 +170,49 @@ class _PickupRequestState extends State<PickupRequest> {
             children: [
               TextFormField(
                 controller: userIdController,
-                readOnly: true, // Make the field read-only
+                readOnly: true,
                 decoration: InputDecoration(labelText: 'User ID'),
+              ),
+              TextFormField(
+                controller: nicController, // New NIC field
+                decoration: InputDecoration(labelText: 'NIC'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your NIC';
+                  }
+                  return null;
+                },
+              ),
+              // Address fields
+              TextFormField(
+                controller: addressNoController, // New address number field
+                decoration: InputDecoration(labelText: 'Address No'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your address number';
+                  }
+                  return null;
+                },
+              ),
+              TextFormField(
+                controller: streetController, // New street field
+                decoration: InputDecoration(labelText: 'Street'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your street';
+                  }
+                  return null;
+                },
+              ),
+              TextFormField(
+                controller: cityController, // New city field
+                decoration: InputDecoration(labelText: 'City'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your city';
+                  }
+                  return null;
+                },
               ),
               TextFormField(
                 controller: pickupDateController,
@@ -220,12 +287,11 @@ class _PickupRequestState extends State<PickupRequest> {
                         ),
                       ),
                       SizedBox(width: 10),
-
-                      // Bag Count TextField
+                      // Bag Count Field
                       Expanded(
                         child: TextFormField(
                           keyboardType: TextInputType.number,
-                          decoration: InputDecoration(labelText: 'No. of Bags'),
+                          decoration: InputDecoration(labelText: 'Bag Count'),
                           onChanged: (value) {
                             setState(() {
                               wasteEntries[index]["bagCount"] =
@@ -234,27 +300,32 @@ class _PickupRequestState extends State<PickupRequest> {
                           },
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Enter bag count';
-                            }
-                            if (int.tryParse(value) == null) {
-                              return 'Please enter a valid integer';
+                              return 'Please enter the bag count';
                             }
                             return null;
                           },
                         ),
                       ),
+                      IconButton(
+                        icon: Icon(Icons.delete),
+                        onPressed: () {
+                          setState(() {
+                            wasteEntries.removeAt(index);
+                          });
+                        },
+                      ),
                     ],
                   );
                 },
               ),
-              TextButton(
+              ElevatedButton(
                 onPressed: _addWasteEntry,
-                child: const Text('Add Another Waste Type'),
+                child: const Text('Add Another Waste Entry'),
               ),
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _submitForm,
-                child: Text('Submit'),
+                child: const Text('Submit Request'),
               ),
             ],
           ),

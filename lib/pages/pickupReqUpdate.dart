@@ -11,7 +11,7 @@ class PickupReqUpdate extends StatefulWidget {
   const PickupReqUpdate({
     Key? key,
     required this.requestId,
-    required this.existingData, // Accept existing data
+    required this.existingData,
   }) : super(key: key);
 
   @override
@@ -20,29 +20,28 @@ class PickupReqUpdate extends StatefulWidget {
 
 class _PickupReqUpdateState extends State<PickupReqUpdate> {
   final _formKey = GlobalKey<FormState>();
-
-  // Create an instance of FirebaseService
   final FirebaseService _firebaseService = FirebaseService();
+
   // Controllers for form fields
   TextEditingController userIdController = TextEditingController();
   TextEditingController pickupDateController = TextEditingController();
   TextEditingController pickupTimeController = TextEditingController();
+  TextEditingController nicController = TextEditingController();
+  TextEditingController addressController = TextEditingController();
 
   DateTime selectedDate = DateTime.now();
   TimeOfDay selectedTime = TimeOfDay.now();
 
   List<Map<String, dynamic>> wasteEntries = [];
-
   final List<String> wasteTypes = ["Organic", "Plastic", "Recyclable", "Other"];
 
   @override
   void initState() {
     super.initState();
     _setUserId();
-    _loadExistingData(); // Load the existing request data
+    _loadExistingData();
   }
 
-  // Function to get the current user's UID
   void _setUserId() async {
     User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
@@ -52,11 +51,12 @@ class _PickupReqUpdateState extends State<PickupReqUpdate> {
     }
   }
 
-  // Function to load existing data from the passed existingData
   void _loadExistingData() {
     setState(() {
       pickupDateController.text = widget.existingData['pickupDate'] ?? '';
       pickupTimeController.text = widget.existingData['pickupTime'] ?? '';
+      nicController.text = widget.existingData['nic'] ?? '';
+      addressController.text = widget.existingData['address'] ?? '';
       wasteEntries = List<Map<String, dynamic>>.from(
           widget.existingData['wasteEntries'] ?? []);
     });
@@ -96,35 +96,43 @@ class _PickupReqUpdateState extends State<PickupReqUpdate> {
     });
   }
 
+  void _removeWasteEntry(int index) {
+    setState(() {
+      wasteEntries.removeAt(index);
+    });
+  }
+
   Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
       String userId = userIdController.text;
       String pickupDate = pickupDateController.text;
       String pickupTime = pickupTimeController.text;
+      String nic = nicController.text;
+      String address = addressController.text;
 
       try {
-        // Update the data in Firestore
         await _firebaseService.updateWasteData(
           requestId: widget.requestId,
           userId: userId,
           pickupDate: pickupDate,
           pickupTime: pickupTime,
           wasteEntries: wasteEntries,
+          nic: nic,
+          address: address,
         );
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Form Updated Successfully')),
-        );
-
-        Navigator.pop(context); // Navigate back after updating
-      } catch (e, stackTrace) {
+        _showSnackBar('Form Updated Successfully');
+        Navigator.pop(context);
+      } catch (e) {
         print('Failed to update form: $e');
-        print('Stack trace: $stackTrace');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to Update Form: $e')),
-        );
+        _showSnackBar('Failed to Update Form: $e');
       }
     }
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -174,6 +182,26 @@ class _PickupReqUpdateState extends State<PickupReqUpdate> {
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please select a pickup time';
+                  }
+                  return null;
+                },
+              ),
+              TextFormField(
+                controller: nicController,
+                decoration: InputDecoration(labelText: 'NIC'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter NIC';
+                  }
+                  return null;
+                },
+              ),
+              TextFormField(
+                controller: addressController,
+                decoration: InputDecoration(labelText: 'Address'),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter Address';
                   }
                   return null;
                 },
@@ -233,11 +261,16 @@ class _PickupReqUpdateState extends State<PickupReqUpdate> {
                               return 'Enter bag count';
                             }
                             if (int.tryParse(value) == null) {
-                              return 'Please enter a valid integer';
+                              return 'Enter valid number';
                             }
                             return null;
                           },
                         ),
+                      ),
+                      SizedBox(width: 10),
+                      IconButton(
+                        icon: Icon(Icons.delete),
+                        onPressed: () => _removeWasteEntry(index),
                       ),
                     ],
                   );
@@ -245,12 +278,12 @@ class _PickupReqUpdateState extends State<PickupReqUpdate> {
               ),
               TextButton(
                 onPressed: _addWasteEntry,
-                child: const Text('Add Another Waste Type'),
+                child: Text('Add Waste Entry'),
               ),
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _submitForm,
-                child: Text('Update'),
+                child: Text('Update Request'),
               ),
             ],
           ),

@@ -102,6 +102,10 @@ class _PickupReqHistoryState extends State<PickupReqHistory> {
                       Text(
                         "Pickup Time: ${data['pickupTime'] ?? 'N/A'}", // Handle null
                       ),
+                      Text(
+                        "Address: ${data['address'] ?? 'N/A'}", // Display the address
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
                       SizedBox(height: 10),
                       Text(
                         "Waste Entries:",
