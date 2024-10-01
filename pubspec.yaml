@@ -41,6 +41,7 @@ dependencies:
   iconsax: ^0.0.8
   fl_chart: ^0.69.0
   get: ^4.6.6
+  intl: ^0.19.0
 
 dev_dependencies:
   flutter_test:

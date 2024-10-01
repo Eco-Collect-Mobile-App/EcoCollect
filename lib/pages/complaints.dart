@@ -13,6 +13,7 @@ class Complaints extends StatelessWidget {
         title: const Text(
           'Complaints', // Title of the header
           style: TextStyle(
+            color: Colors.white,
             fontWeight: FontWeight.bold, // Bold font weight
           ),
         ),

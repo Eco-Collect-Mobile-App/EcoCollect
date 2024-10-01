@@ -1,6 +1,7 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
+import 'package:eco_collect/user_management/models/UserModel.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -15,6 +16,10 @@ class _DashboardState extends State<Dashboard> {
 
   @override
   Widget build(BuildContext context) {
+    // Access the logged-in user's uid from the StreamProvider
+    final user = Provider.of<UserModel?>(context);
+    final String? uid = user?.uid;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Dashboard"),
@@ -38,13 +43,22 @@ class _DashboardState extends State<Dashboard> {
 
           // If data is available
           if (streamSnapshot.hasData) {
-            print(streamSnapshot.data!.docs); // Debugging: Log the data
+            // Filter documents by matching the uid with userId from Firestore
+            var filteredDocs = streamSnapshot.data!.docs.where((doc) {
+              return doc['userId'] ==
+                  uid; // Only include documents with matching userId
+            }).toList();
+
+            if (filteredDocs.isEmpty) {
+              return const Center(
+                child: Text('No data found for this user'),
+              );
+            }
 
             return ListView.builder(
-              itemCount: streamSnapshot.data!.docs.length,
+              itemCount: filteredDocs.length,
               itemBuilder: (context, index) {
-                final DocumentSnapshot documentSnapshot =
-                    streamSnapshot.data!.docs[index];
+                final DocumentSnapshot documentSnapshot = filteredDocs[index];
 
                 // Extracting necessary data from the document
                 String pickupDate = documentSnapshot['pickupDate'];
