@@ -53,8 +53,8 @@ class _Sign_InState extends State<Sign_In> {
                       children: [
                         //email
                         TextFormField(
-                          style: TextStyle(
-                              color: const Color.fromARGB(255, 0, 0, 0)),
+                          style: const TextStyle(
+                              color: Color.fromARGB(255, 0, 0, 0)),
                           decoration: TextInputDecorarion,
                           validator: (val) => val?.isEmpty == true
                               ? "Enter the valid username or email"
@@ -70,8 +70,8 @@ class _Sign_InState extends State<Sign_In> {
                           height: 20,
                         ),
                         TextFormField(
-                          style: TextStyle(
-                              color: const Color.fromARGB(255, 0, 0, 0)),
+                          style: const TextStyle(
+                              color: Color.fromARGB(255, 0, 0, 0)),
                           decoration: TextInputDecorarion.copyWith(
                               hintText: "Password"),
                           validator: (val) =>

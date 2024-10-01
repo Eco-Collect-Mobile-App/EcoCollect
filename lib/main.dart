@@ -23,13 +23,16 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamProvider<UserModel?>.value(
-      initialData: UserModel(uid: ""),
-      value: AuthServices().user,
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home:
-            Wrapper(), // Show the Wrapper, which handles navigation based on login state
-      ),
-    );
+        initialData: UserModel(uid: ""),
+        value: AuthServices().user,
+        child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          home: Wrapper(),
+          initialRoute: '/',
+          routes: {
+            // '/login': (context) => LoginPage(),
+            // other routes
+          },
+        ));
   }
 }
