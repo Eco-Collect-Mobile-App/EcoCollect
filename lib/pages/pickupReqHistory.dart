@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eco_collect/service/firebase_service.dart';
 import 'package:eco_collect/pages/pickupReqDelete.dart'; // Ensure this page exists
 import 'package:eco_collect/pages/pickupReqUpdate.dart'; // Ensure this page exists
+import 'package:eco_collect/pages/qrcodeGenerator.dart';
 
 class PickupReqHistory extends StatefulWidget {
   @override
@@ -173,6 +174,20 @@ class _PickupReqHistoryState extends State<PickupReqHistory> {
                                   Colors.red, // Red color for delete
                             ),
                             child: Text("Delete"),
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              // Navigate to the QR Code generator page
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => QRCodeGenerator(
+                                      requestId: document
+                                          .id), // Pass the document ID to QR Code page if needed
+                                ),
+                              );
+                            },
+                            child: Text("Get the QR Code"),
                           ),
                         ],
                       ),

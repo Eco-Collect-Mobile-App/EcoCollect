@@ -42,7 +42,8 @@ dependencies:
   iconsax: ^0.0.8
   intl: ^0.19.0
   qr_flutter: ^4.1.0
-  uuid: ^4.5.1
+  path_provider: ^2.1.4
+  permission_handler: ^11.3.1
 
 dev_dependencies:
   flutter_test:
