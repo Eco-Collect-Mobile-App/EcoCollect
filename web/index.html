@@ -31,8 +31,46 @@
 
   <title>eco_collect</title>
   <link rel="manifest" href="manifest.json">
+
+  <script defer src="/__/firebase/9.0.0/firebase-app.js"></script>
+  <script defer src="/__/firebase/9.0.0/firebase-auth.js"></script>
+  <script defer src="/__/firebase/init.js"></script>
+
 </head>
 <body>
   <script src="flutter_bootstrap.js" async></script>
+
+  <script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js"></script>
+
+
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+  const firebaseConfig = {
+    apiKey: "AIzaSyCo9UegsA-dMa4ayqGmcfoe-8Ir5Gm80Ok",
+    authDomain: "eco-collect-app.firebaseapp.com",
+    projectId: "eco-collect-app",
+    storageBucket: "eco-collect-app.appspot.com",
+    messagingSenderId: "719946172570",
+    appId: "1:719946172570:web:485c278806a3894a82f723",
+    measurementId: "G-F97P3SFQSW"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
+
 </body>
+
+
+
 </html>
