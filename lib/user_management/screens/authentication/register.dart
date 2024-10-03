@@ -48,7 +48,7 @@ class _RegisterState extends State<Register> {
               ),
               Center(
                 child: Image.asset(
-                  "assets/images/ecologo2.png",
+                  "assets/images/icon.png",
                   height: 100,
                 ),
               ),

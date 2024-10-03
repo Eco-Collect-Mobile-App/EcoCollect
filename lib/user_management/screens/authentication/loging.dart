@@ -42,7 +42,7 @@ class _Sign_InState extends State<Sign_In> {
               ),
               Center(
                   child: Image.asset(
-                "assets/images/ecologo.png",
+                "assets/images/icon.png",
                 height: 200,
               )),
               Padding(
