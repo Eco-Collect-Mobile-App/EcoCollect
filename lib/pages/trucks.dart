@@ -32,10 +32,8 @@ class Trucks extends StatelessWidget {
                   20), // Add spacing between the notification icon and the edge
         ],
       ),
-      body: Center(
-        child: user != null
-            ? Text('User UID: ${user.uid}') // Display the UID
-            : const Text('No user logged in'), // Display a message if no user
+      body: const Center(
+        child: Text('Schedule Page Content'), // Placeholder for page content
       ),
     );
   }

@@ -1,4 +1,5 @@
 import 'package:eco_collect/pages/complaints.dart';
+import 'package:eco_collect/pages/complaints_home.dart';
 import 'package:eco_collect/pages/profile.dart';
 import 'package:eco_collect/pages/dashboard.dart';
 import 'package:eco_collect/pages/datachart.dart';
@@ -67,7 +68,7 @@ class NavigationController extends GetxController {
     const Schedule(),
     const Trucks(),
     const DataChart(),
-    const Dashboard(),
+    const ComplaintsHome(),
     Profile(),
   ];
 }
