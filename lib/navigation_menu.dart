@@ -74,8 +74,6 @@ class NavigationController extends GetxController {
     PickupRequest(),
     PickupReqHistory(),
     const DataChart(),
-    const Dashboard(),
-    const DataChart(),
     WastePlans(),
     Profile(),
   ];
