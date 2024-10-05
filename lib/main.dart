@@ -4,6 +4,7 @@ import 'package:eco_collect/user_management/models/UserModel.dart';
 import 'package:eco_collect/user_management/screens/wrapper.dart';
 import 'package:eco_collect/user_management/services/auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 
 ///
 
@@ -12,7 +13,9 @@ import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await Firebase.initializeApp();
+
   runApp(const MyApp());
 }
 
