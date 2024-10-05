@@ -1,3 +1,4 @@
+import 'package:eco_collect/pages/pickupReport.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eco_collect/service/firebase_service.dart';
@@ -30,13 +31,14 @@ class _PickupReqHistoryState extends State<PickupReqHistory> {
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(
-              Icons.download,
-              color: Colors.white,
-            ),
+            icon: const Icon(Icons.picture_as_pdf,
+                color: Colors.white), // Download icon
             onPressed: () {
-              // Define the functionality of the button here
-              print("Dwonload report");
+              // Navigate to the PickupReqReport screen
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => PickupReqReport()),
+              );
             },
           ),
         ],
@@ -257,27 +259,30 @@ class _PickupReqHistoryState extends State<PickupReqHistory> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          ElevatedButton(
-                            onPressed: () {
-                              // Navigate to the pickupReqUpdate page, pass the document ID and existing data
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => PickupReqUpdate(
-                                    requestId: document.id,
-                                    existingData:
-                                        data, // Pass the existing data here
+                          if (data['wasteEntries'] != null &&
+                              (data['wasteEntries'] as List)
+                                  .any((entry) => entry['weight'] == null))
+                            ElevatedButton(
+                              onPressed: () {
+                                // Navigate to the pickupReqUpdate page, pass the document ID and existing data
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => PickupReqUpdate(
+                                      requestId: document.id,
+                                      existingData:
+                                          data, // Pass the existing data here
+                                    ),
                                   ),
-                                ),
-                              );
-                            },
-                            style: ElevatedButton.styleFrom(
-                              foregroundColor: Colors.white,
-                              backgroundColor:
-                                  Color(0xFF5FAD46), // White text color
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                foregroundColor: Colors.white,
+                                backgroundColor:
+                                    Color(0xFF5FAD46), // White text color
+                              ),
+                              child: Text("Update"),
                             ),
-                            child: Text("Update"),
-                          ),
                           ElevatedButton(
                             onPressed: () {
                               // Navigate to the pickupReqDelete page, pass the document ID
@@ -297,26 +302,29 @@ class _PickupReqHistoryState extends State<PickupReqHistory> {
                             ),
                             child: const Text("Delete"),
                           ),
-                          ElevatedButton(
-                            onPressed: () {
-                              // Navigate to the QR Code generator page
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => QRCodeGenerator(
-                                    requestId: document
-                                        .id, // Pass the document ID to QR Code page if needed
+                          if (data['wasteEntries'] != null &&
+                              (data['wasteEntries'] as List)
+                                  .any((entry) => entry['weight'] == null))
+                            ElevatedButton(
+                              onPressed: () {
+                                // Navigate to the QR Code generator page
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => QRCodeGenerator(
+                                      requestId: document
+                                          .id, // Pass the document ID to QR Code page if needed
+                                    ),
                                   ),
-                                ),
-                              );
-                            },
-                            style: ElevatedButton.styleFrom(
-                              foregroundColor: Colors.white,
-                              backgroundColor:
-                                  Color(0xFF5FAD46), // White text color
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                foregroundColor: Colors.white,
+                                backgroundColor:
+                                    Color(0xFF5FAD46), // White text color
+                              ),
+                              child: Text("QR Code"),
                             ),
-                            child: Text("QR Code"),
-                          ),
                         ],
                       ),
                     ],
