@@ -1,4 +1,10 @@
 import 'package:eco_collect/pages/complaints.dart';
+import 'package:eco_collect/pages/plans.dart';
+import 'package:eco_collect/pages/profile.dart';
+import 'package:eco_collect/pages/dashboard.dart';
+import 'package:eco_collect/pages/datachart.dart';
+import 'package:eco_collect/pages/schedule.dart';
+
 import 'package:eco_collect/pages/pickupReqHistory.dart';
 import 'package:eco_collect/pages/profile.dart';
 import 'package:eco_collect/pages/dashboard.dart';
@@ -69,6 +75,8 @@ class NavigationController extends GetxController {
     PickupReqHistory(),
     const DataChart(),
     const Dashboard(),
+    const DataChart(),
+    WastePlans(),
     Profile(),
   ];
 }

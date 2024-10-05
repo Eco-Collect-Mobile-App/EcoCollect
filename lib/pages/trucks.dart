@@ -12,7 +12,6 @@ class Trucks extends StatelessWidget {
             const Color(0xFF27AE60), // Green color for the background
         title: const Text(
           'Locate a truck', // Title of the header
-
           style: TextStyle(
             fontWeight: FontWeight.bold, // Bold font weight
           ),
