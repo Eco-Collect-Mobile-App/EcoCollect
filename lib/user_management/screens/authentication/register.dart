@@ -48,7 +48,7 @@ class _RegisterState extends State<Register> {
               ),
               Center(
                 child: Image.asset(
-                  "assets/images/ecologo2.png",
+                  "assets/images/icon.png",
                   height: 100,
                 ),
               ),
@@ -61,7 +61,7 @@ class _RegisterState extends State<Register> {
                       //name field
                       TextFormField(
                         style: const TextStyle(color: Colors.black),
-                        decoration: TextInputDecorarion.copyWith(
+                        decoration: const InputDecoration(
                           hintText: "Name",
                         ),
                         validator: (val) =>
@@ -76,7 +76,7 @@ class _RegisterState extends State<Register> {
                       //email field
                       TextFormField(
                         style: const TextStyle(color: Colors.black),
-                        decoration: TextInputDecorarion.copyWith(
+                        decoration: const InputDecoration(
                           hintText: "Email",
                         ),
                         validator: (val) => val!.isEmpty
@@ -89,24 +89,34 @@ class _RegisterState extends State<Register> {
                         },
                       ),
                       const SizedBox(height: 20),
+                      const SizedBox(height: 20),
                       TextFormField(
                         style: const TextStyle(color: Colors.black),
-                        decoration: TextInputDecorarion.copyWith(
+                        decoration: const InputDecoration(
                           hintText: "NIC",
                         ),
-                        validator: (val) =>
-                            val!.isEmpty ? "Enter valid NIC" : null,
+                        validator: (val) {
+                          if (val == null || val.isEmpty) {
+                            return "Enter a valid NIC";
+                          } else if (!RegExp(r'^[0-9]{9}[VXvx]$')
+                                  .hasMatch(val) &&
+                              !RegExp(r'^[0-9]{12}$').hasMatch(val)) {
+                            return "Enter a valid NIC (e.g., 123456789V or 199023456789)";
+                          }
+                          return null;
+                        },
                         onChanged: (val) {
                           setState(() {
                             nic = val;
                           });
                         },
                       ),
+
                       const SizedBox(height: 20),
                       //password field
                       TextFormField(
                         style: const TextStyle(color: Colors.black),
-                        decoration: TextInputDecorarion.copyWith(
+                        decoration: const InputDecoration(
                           hintText: "Password",
                         ),
                         validator: (val) => val!.length < 6
@@ -122,22 +132,33 @@ class _RegisterState extends State<Register> {
                       //phone number field
                       TextFormField(
                         style: const TextStyle(color: Colors.black),
-                        decoration: TextInputDecorarion.copyWith(
+                        decoration: const InputDecoration(
                           hintText: "Phone Number",
                         ),
-                        validator: (val) =>
-                            val!.isEmpty ? "Enter a valid phone number" : null,
+                        keyboardType: TextInputType
+                            .phone, // To bring up the phone number keyboard
+                        validator: (val) {
+                          if (val == null || val.isEmpty) {
+                            return "Enter a valid phone number";
+                          } else if (val.length != 10) {
+                            return "Phone number must be 10 digits";
+                          } else if (!RegExp(r'^[0-9]{10}$').hasMatch(val)) {
+                            return "Enter only digits";
+                          }
+                          return null;
+                        },
                         onChanged: (val) {
                           setState(() {
                             phone = val;
                           });
                         },
                       ),
+
                       const SizedBox(height: 20),
                       //address fields (No, Street, City)
                       TextFormField(
                         style: const TextStyle(color: Colors.black),
-                        decoration: TextInputDecorarion.copyWith(
+                        decoration: const InputDecoration(
                           hintText: "Address No.",
                         ),
                         validator: (val) => val!.isEmpty
@@ -152,7 +173,7 @@ class _RegisterState extends State<Register> {
                       const SizedBox(height: 20),
                       TextFormField(
                         style: const TextStyle(color: Colors.black),
-                        decoration: TextInputDecorarion.copyWith(
+                        decoration: const InputDecoration(
                           hintText: "Street",
                         ),
                         validator: (val) =>
@@ -166,7 +187,7 @@ class _RegisterState extends State<Register> {
                       const SizedBox(height: 20),
                       TextFormField(
                         style: const TextStyle(color: Colors.black),
-                        decoration: TextInputDecorarion.copyWith(
+                        decoration: const InputDecoration(
                           hintText: "City",
                         ),
                         validator: (val) =>

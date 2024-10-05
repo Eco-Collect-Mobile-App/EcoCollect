@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:eco_collect/user_management/models/UserModel.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:eco_collect/pages/preferences.dart';
+import 'package:pie_chart/pie_chart.dart';
 
 class DataChart extends StatefulWidget {
   const DataChart({Key? key}) : super(key: key);
@@ -16,6 +17,10 @@ class DataChart extends StatefulWidget {
 
 class _DataChartState extends State<DataChart> {
   String _selectedPeriod = '7D'; // Default selected period
+  double totalPlastic = 0.0;
+  double totalOrganic = 0.0;
+  double totalRecyclable = 0.0;
+  double totalOther = 0.0;
 
   @override
   Widget build(BuildContext context) {
@@ -24,10 +29,9 @@ class _DataChartState extends State<DataChart> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor:
-            const Color(0xFF27AE60), // Green color for the background
+        backgroundColor: const Color(0xFF27AE60),
         title: const Text(
-          'Dashboard', // Title of the header
+          'Dashboard',
           style: TextStyle(
             color: Colors.white,
             fontWeight: FontWeight.bold,
@@ -35,15 +39,12 @@ class _DataChartState extends State<DataChart> {
         ),
         actions: [
           IconButton(
-            icon: Icon(Iconsax.notification,
-                color: Colors.white), // Notification icon
+            icon: Icon(Iconsax.notification, color: Colors.white),
             onPressed: () {
               // Add your notification button action here
             },
           ),
-          const SizedBox(
-              width:
-                  20), // Add spacing between the notification icon and the edge
+          const SizedBox(width: 20),
         ],
       ),
       body: Column(
@@ -53,9 +54,9 @@ class _DataChartState extends State<DataChart> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _buildFilterButton('7D', 'Last 7 Days'),
-                _buildFilterButton('30D', 'Last 30 Days'),
-                _buildFilterButton('3M', 'Last 3 Months'),
+                _buildFilterButton('7D', '7 Days'),
+                _buildFilterButton('30D', '30 Days'),
+                _buildFilterButton('3M', '3 Months'),
               ],
             ),
           ),
@@ -75,27 +76,53 @@ class _DataChartState extends State<DataChart> {
                     return const CircularProgressIndicator();
                   }
 
+                  // Reset totals for each stream update
+                  totalPlastic = 0.0;
+                  totalOrganic = 0.0;
+                  totalRecyclable = 0.0;
+                  totalOther = 0.0;
+
                   // Parse and filter the waste data based on the selected period
                   List<FlSpot> plasticSpots = [];
                   List<FlSpot> organicSpots = [];
                   List<FlSpot> recyclableSpots = [];
 
-                  // Get the current date and calculate the cutoff date based on the selected period
                   DateTime now = DateTime.now();
                   DateTime cutoffDate;
+                  List<String> dateLabels = [];
                   switch (_selectedPeriod) {
                     case '30D':
                       cutoffDate = now.subtract(const Duration(days: 30));
+                      for (int i = 0; i < 4; i++) {
+                        dateLabels.insert(
+                          0,
+                          DateFormat('MM/dd')
+                              .format(now.subtract(Duration(days: i * 7))),
+                        );
+                      }
                       break;
                     case '3M':
                       cutoffDate = now.subtract(const Duration(days: 90));
+                      for (int i = 0; i < 3; i++) {
+                        dateLabels.insert(
+                          0,
+                          DateFormat('MMMM yyyy')
+                              .format(now.subtract(Duration(days: 30 * i))),
+                        );
+                      }
                       break;
                     case '7D':
                     default:
                       cutoffDate = now.subtract(const Duration(days: 7));
+                      for (int i = 0; i < 7; i++) {
+                        dateLabels.insert(
+                          0,
+                          DateFormat('MM/dd')
+                              .format(now.subtract(Duration(days: i))),
+                        );
+                      }
                   }
 
-                  // Collect and sort the documents by 'pickupDate'
                   List<QueryDocumentSnapshot> sortedDocs =
                       List.from(snapshot.data!.docs);
                   sortedDocs = sortedDocs.where((doc) {
@@ -109,7 +136,6 @@ class _DataChartState extends State<DataChart> {
                     return dateA.compareTo(dateB);
                   });
 
-                  // Only include every second day in the sortedDocs
                   sortedDocs = sortedDocs
                       .asMap()
                       .entries
@@ -120,22 +146,29 @@ class _DataChartState extends State<DataChart> {
                   sortedDocs.asMap().forEach((index, doc) {
                     String pickupDate = doc['pickupDate'];
                     DateTime parsedDate = DateTime.parse(pickupDate);
-                    double xValue =
-                        index.toDouble(); // Use sorted index for X-axis
+                    double xValue = index.toDouble();
 
                     List wasteEntries = doc['wasteEntries'];
                     wasteEntries.forEach((entry) {
-                      double weight = entry['weight']?.toDouble() ?? 0;
+                      double weight = entry['weight'] is String
+                          ? double.parse(entry['weight'])
+                          : entry['weight']?.toDouble() ?? 0.0;
 
                       switch (entry['wasteType']) {
                         case 'Plastic':
                           plasticSpots.add(FlSpot(xValue, weight));
+                          totalPlastic += weight; // Sum Plastic weight
                           break;
                         case 'Organic':
                           organicSpots.add(FlSpot(xValue, weight));
+                          totalOrganic += weight; // Sum Organic weight
                           break;
                         case 'Recyclable':
                           recyclableSpots.add(FlSpot(xValue, weight));
+                          totalRecyclable += weight; // Sum Recyclable weight
+                          break;
+                        case 'Other':
+                          totalOther += weight; // Sum Other weight
                           break;
                         default:
                           break;
@@ -148,51 +181,127 @@ class _DataChartState extends State<DataChart> {
                       Container(
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius:
-                              BorderRadius.circular(12), // Rounded corners
+                          borderRadius: BorderRadius.circular(12),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.grey.withOpacity(0.2),
                               spreadRadius: 2,
                               blurRadius: 5,
-                              offset: const Offset(
-                                  0, 3), // changes position of shadow
+                              offset: const Offset(0, 3),
                             ),
                           ],
                         ),
                         height: 350,
                         width: 350,
-                        padding: const EdgeInsets.all(
-                            16), // Padding between box and chart
+                        padding: const EdgeInsets.all(16),
                         child: LineChart(
                           LineChartData(
                             gridData: gridData,
-                            titlesData: titlesData(sortedDocs),
+                            titlesData: titlesData(dateLabels),
                             borderData: borderData,
                             lineBarsData: [
-                              lineChartBarData(
-                                  plasticSpots, Colors.red), // Plastic (Red)
-                              lineChartBarData(organicSpots,
-                                  Colors.purple), // Organic (Purple)
-                              lineChartBarData(recyclableSpots,
-                                  Colors.green), // Recyclable (Green)
+                              lineChartBarData(plasticSpots, Colors.red),
+                              lineChartBarData(organicSpots, Colors.purple),
+                              lineChartBarData(recyclableSpots, Colors.green),
                             ],
                             minX: 0,
-                            maxX: (sortedDocs.length - 1).toDouble(),
+                            maxX: (dateLabels.length - 1).toDouble(),
                             minY: 0,
-                            maxY:
-                                10, // Adjust the maxY based on the weight data
+                            maxY: 10,
                           ),
                         ),
                       ),
                       const SizedBox(height: 16),
+                      // Total sum boxes
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                SizedBox(
+                                  width: 160,
+                                  child: _buildTotalBox(
+                                    'Plastic',
+                                    totalPlastic,
+                                    Colors.red,
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 160,
+                                  child: _buildTotalBox(
+                                      'Organic', totalOrganic, Colors.purple),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 10),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                SizedBox(
+                                  width: 160,
+                                  child: _buildTotalBox('Recyclable',
+                                      totalRecyclable, Colors.green),
+                                ),
+                                SizedBox(
+                                  width: 160,
+                                  child: _buildTotalBox(
+                                      'Other', totalOther, Colors.grey),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      // Pie chart to show total sums of each waste type
+                      /*PieChart(
+                        dataMap: {
+                          "Plastic": totalPlastic,
+                          "Organic": totalOrganic,
+                          "Recyclable": totalRecyclable,
+                          "Other": totalOther,
+                        },
+                        animationDuration: const Duration(milliseconds: 800),
+                        chartLegendSpacing: 32,
+                        chartRadius: MediaQuery.of(context).size.width / 3,
+                        colorList: [
+                          Colors.red, // Plastic
+                          Colors.purple, // Organic
+                          Colors.green, // Recyclable
+                          Colors.grey, // Other
+                        ],
+                        initialAngleInDegree: 0,
+                        chartType: ChartType.disc,
+                        legendOptions: const LegendOptions(
+                          showLegendsInRow: false,
+                          legendPosition: LegendPosition.right,
+                          showLegends: true,
+                          legendTextStyle: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 14),
+                        ),
+                        chartValuesOptions: const ChartValuesOptions(
+                          showChartValueBackground: false,
+                          showChartValues: true,
+                          chartValueStyle: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14),
+                        ),
+                      ), */
+
+                      const SizedBox(height: 16),
+
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              const Color(0xFF27AE60), // Green background
+                          backgroundColor: const Color(0xFF5FAD46),
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.circular(10), // Rounded corners
+                          ),
                         ),
                         onPressed: () async {
-                          // Navigate to the UserGoals page and wait for the result (selected goals)
                           final selectedGoals = await Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -202,7 +311,6 @@ class _DataChartState extends State<DataChart> {
 
                           if (selectedGoals != null &&
                               selectedGoals is List<String>) {
-                            // Do something with the selected goals, e.g., save them to Firestore or update UI
                             print('Selected Goals: $selectedGoals');
                           }
                         },
@@ -224,13 +332,20 @@ class _DataChartState extends State<DataChart> {
 
   // Build the filter button widget
   Widget _buildFilterButton(String period, String label) {
+    bool isSelected = _selectedPeriod == period;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: _selectedPeriod == period
-              ? const Color(0xFF27AE60) // Active period button color
-              : Colors.grey[300], // Inactive button color
+          backgroundColor: isSelected
+              ? const Color(0xFF5FAD46)
+              : Colors.white, // Background color
+          padding: const EdgeInsets.symmetric(
+              vertical: 12.0, horizontal: 28.0), // Optional padding
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10), // Rounded corners
+          ),
         ),
         onPressed: () {
           setState(() {
@@ -240,80 +355,112 @@ class _DataChartState extends State<DataChart> {
         child: Text(
           label,
           style: TextStyle(
-            color: _selectedPeriod == period ? Colors.white : Colors.black,
+            color: isSelected ? Colors.white : Colors.black, // Text color
+            fontWeight: FontWeight.bold, // Optional: bold text
           ),
         ),
       ),
     );
   }
-}
 
-// Function to create LineChartBarData for each waste type
-LineChartBarData lineChartBarData(List<FlSpot> spots, Color color) {
-  return LineChartBarData(
-    isCurved: true,
-    color: color,
-    barWidth: 4,
-    isStrokeCapRound: true,
-    dotData: FlDotData(show: false),
-    belowBarData: BarAreaData(show: false),
-    spots: spots,
-  );
-}
-
-// Customize the titles (bottom and left only)
-FlTitlesData titlesData(List<QueryDocumentSnapshot> sortedDocs) => FlTitlesData(
-      bottomTitles: AxisTitles(
-        sideTitles: SideTitles(
-          showTitles: true,
-          getTitlesWidget: (double value, TitleMeta meta) {
-            if (value.toInt() < sortedDocs.length) {
-              var date =
-                  DateTime.parse(sortedDocs[value.toInt()]['pickupDate']);
-              return Text(DateFormat('MM/dd').format(date),
-                  style: const TextStyle(fontSize: 12));
-            }
-            return const Text('');
-          },
-          interval: 1,
-          reservedSize: 30,
-        ),
+  // Build total box widget
+  Widget _buildTotalBox(String label, double total, Color color) {
+    return Container(
+      padding: const EdgeInsets.all(8.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.2),
+            spreadRadius: 2,
+            blurRadius: 5,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
-      leftTitles: AxisTitles(
-        sideTitles: SideTitles(
-          showTitles: true,
-          interval: 1,
-          getTitlesWidget: (value, meta) {
-            return Text(value.toString(), style: const TextStyle(fontSize: 12));
-          },
-          reservedSize: 40,
-        ),
-      ),
-      topTitles: AxisTitles(
-        sideTitles: SideTitles(
-          showTitles: false, // Disable top titles
-        ),
-      ),
-      rightTitles: AxisTitles(
-        sideTitles: SideTitles(
-          showTitles: false, // Disable right titles
-        ),
+      child: Column(
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16.0,
+            ),
+          ),
+          Text(
+            '${total.toStringAsFixed(2)} Kg',
+            style: TextStyle(
+              color: color,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
       ),
     );
+  }
 
-// Grid lines (optional)
-FlGridData get gridData => FlGridData(show: true);
-
-// Borders around the chart
-FlBorderData get borderData => FlBorderData(
-      show: true,
-      border: const Border(
-        bottom: BorderSide(color: Colors.black),
-        left: BorderSide(color: Colors.black),
-        right: BorderSide(color: Colors.transparent),
-        top: BorderSide(color: Colors.transparent),
-      ),
+  // Line chart bar data
+  LineChartBarData lineChartBarData(List<FlSpot> spots, Color color) {
+    return LineChartBarData(
+      spots: spots,
+      isCurved: true,
+      color: color, // Change from colors: [color] to color: color
+      dotData: FlDotData(show: false),
+      belowBarData: BarAreaData(show: false),
+      barWidth: 6,
     );
+  }
 
-// Example of AnotherPage for navigation
+  // Line chart grid data
+  FlGridData get gridData => FlGridData(show: true);
 
+  // Line chart border data
+  FlBorderData get borderData => FlBorderData(
+        show: true,
+        border: const Border(
+          bottom: BorderSide(color: Colors.black, width: 1),
+          left: BorderSide(color: Colors.black, width: 1),
+          right: BorderSide(color: Colors.transparent),
+          top: BorderSide(color: Colors.transparent),
+        ),
+      );
+
+  // Titles data with formatted labels
+  FlTitlesData titlesData(List<String> dateLabels) => FlTitlesData(
+        bottomTitles: AxisTitles(
+          sideTitles: SideTitles(
+            showTitles: true,
+            getTitlesWidget: (value, meta) {
+              final index = value.toInt();
+              return SideTitleWidget(
+                axisSide: meta.axisSide,
+                child: Text(
+                  index >= 0 && index < dateLabels.length
+                      ? dateLabels[index]
+                      : '',
+                ),
+              );
+            },
+            interval: 1,
+          ),
+        ),
+        leftTitles: AxisTitles(
+          sideTitles: SideTitles(
+            showTitles: true,
+            interval: 2,
+          ),
+        ),
+        topTitles: AxisTitles(
+          sideTitles: SideTitles(
+            showTitles: false, // Disable top titles
+          ),
+        ),
+        rightTitles: AxisTitles(
+          sideTitles: SideTitles(
+            showTitles: false, // Disable right titles
+          ),
+        ),
+      );
+}
