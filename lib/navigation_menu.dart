@@ -1,8 +1,9 @@
 import 'package:eco_collect/pages/complaints.dart';
+import 'package:eco_collect/pages/pickupReqHistory.dart';
 import 'package:eco_collect/pages/profile.dart';
 import 'package:eco_collect/pages/dashboard.dart';
 import 'package:eco_collect/pages/datachart.dart';
-import 'package:eco_collect/pages/schedule.dart';
+import 'package:eco_collect/pages/pickupRequest.dart';
 import 'package:eco_collect/pages/trucks.dart';
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
@@ -64,8 +65,8 @@ class NavigationController extends GetxController {
 
   // List of screens for navigation
   final screens = [
-    const Schedule(),
-    const Trucks(),
+    PickupRequest(),
+    PickupReqHistory(),
     const DataChart(),
     const Dashboard(),
     Profile(),

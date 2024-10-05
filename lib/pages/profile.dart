@@ -1,5 +1,6 @@
 import 'package:eco_collect/user_management/services/auth.dart';
 import 'package:flutter/material.dart';
+import 'package:eco_collect/user_management/screens/home/update.dart'; // Import the update page
 
 class Profile extends StatefulWidget {
   @override
@@ -36,12 +37,63 @@ class _ProfileState extends State<Profile> {
     }
   }
 
-  Future<void> _deleteProfile() async {
-    print("Profile deleted");
+  // Function to handle delete profile
+  Future<void> _deleteProfile(BuildContext context) async {
+    String? password = await _showPasswordConfirmationDialog(context);
+
+    if (password != null) {
+      // Authenticate the user with their password
+      bool isPasswordCorrect = await _auth.reauthenticateUser(password);
+
+      if (isPasswordCorrect) {
+        // Delete the user profile
+        await _auth.deleteUser();
+
+        // Navigate to the login page after deletion
+        Navigator.pop(context, true);
+      } else {
+        // Show error message if password is incorrect
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Incorrect password!')),
+        );
+      }
+    }
   }
 
-  Future<void> _updateProfile() async {
-    print("Profile update");
+  // Show a dialog to confirm the password
+  Future<String?> _showPasswordConfirmationDialog(BuildContext context) async {
+    String? password;
+    return showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Enter your password to delete profile'),
+          content: TextField(
+            obscureText: true,
+            decoration: const InputDecoration(
+              labelText: 'Password',
+            ),
+            onChanged: (value) {
+              password = value;
+            },
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(password);
+              },
+              child: const Text('Confirm'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(null);
+              },
+              child: const Text('Cancel'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -49,19 +101,18 @@ class _ProfileState extends State<Profile> {
     return Scaffold(
       backgroundColor: const Color(0XffE7EBE8),
       appBar: AppBar(
-        title: const Text(
-          'User Profile',
-          style: TextStyle(color: Colors.white),
-        ),
+        title:
+            const Text('User Profile', style: TextStyle(color: Colors.white)),
         backgroundColor: const Color(0Xff27AE60),
         actions: [
+          // Logout button
           ElevatedButton(
             style: ButtonStyle(
               backgroundColor:
                   MaterialStateProperty.all(const Color(0Xff27AE60)),
             ),
             onPressed: () async {
-              await _auth.signOut();
+              await _auth.signOut(); // Logout functionality
             },
             child: const Icon(Icons.logout, color: Colors.white),
           ),
@@ -74,46 +125,52 @@ class _ProfileState extends State<Profile> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  // Display Profile Image
                   Center(
-                    child: Image.asset(
-                      "assets/images/man.png",
-                      height: 150,
-                    ),
+                    child: Image.asset("assets/images/man.png", height: 150),
                   ),
                   const SizedBox(height: 30),
-                  Text(
-                    'Name: $name',
-                    style: const TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
+                  Text('Name: $name',
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 10),
-                  Text(
-                    'Email: $email',
-                    style: const TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
+                  Text('Email: $email',
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 10),
-                  Text(
-                    'NIC: $nic',
-                    style: const TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
+                  Text('NIC: $nic',
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 10),
-                  Text(
-                    'Phone: $phone',
-                    style: const TextStyle(fontSize: 18),
-                  ),
+                  Text('Phone: $phone', style: const TextStyle(fontSize: 18)),
                   const SizedBox(height: 10),
-                  Text(
-                    'Address: $addressNo, $street, $city',
-                    style: const TextStyle(fontSize: 18),
-                  ),
+                  Text('Address: $addressNo, $street, $city',
+                      style: const TextStyle(fontSize: 18)),
                   const SizedBox(height: 30),
-
-                  // Update Profile Button
                   ElevatedButton(
-                    onPressed: _updateProfile,
+                    onPressed: () async {
+                      // Navigate to the UpdateProfile page and wait for result
+                      bool? updated = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => UpdateProfile(
+                            userData: {
+                              'name': name,
+                              'email': email,
+                              'nic': nic,
+                              'phone': phone,
+                              'addressNo': addressNo,
+                              'street': street,
+                              'city': city,
+                            },
+                          ),
+                        ),
+                      );
+
+                      // If the profile was updated, reload the data
+                      if (updated == true) {
+                        _loadUserData();
+                      }
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,
                       padding: const EdgeInsets.symmetric(
@@ -122,17 +179,15 @@ class _ProfileState extends State<Profile> {
                         borderRadius: BorderRadius.circular(20),
                       ),
                     ),
-                    child: const Text(
-                      'Update Profile',
-                      style: TextStyle(fontSize: 16, color: Colors.white),
-                    ),
+                    child: const Text('Update Profile',
+                        style: TextStyle(fontSize: 16, color: Colors.white)),
                   ),
-
-                  const SizedBox(height: 10),
-
+                  const SizedBox(height: 20),
                   // Delete Profile Button
                   ElevatedButton(
-                    onPressed: _deleteProfile,
+                    onPressed: () {
+                      _deleteProfile(context); // Call delete function
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
                       padding: const EdgeInsets.symmetric(
@@ -141,10 +196,8 @@ class _ProfileState extends State<Profile> {
                         borderRadius: BorderRadius.circular(20),
                       ),
                     ),
-                    child: const Text(
-                      'Delete Profile',
-                      style: TextStyle(fontSize: 16, color: Colors.white),
-                    ),
+                    child: const Text('Delete Profile',
+                        style: TextStyle(fontSize: 16, color: Colors.white)),
                   ),
                 ],
               ),
