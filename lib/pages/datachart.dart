@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:eco_collect/user_management/models/UserModel.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:eco_collect/pages/preferences.dart';
+import 'package:pie_chart/pie_chart.dart';
 
 class DataChart extends StatefulWidget {
   const DataChart({Key? key}) : super(key: key);
@@ -88,16 +89,38 @@ class _DataChartState extends State<DataChart> {
 
                   DateTime now = DateTime.now();
                   DateTime cutoffDate;
+                  List<String> dateLabels = [];
                   switch (_selectedPeriod) {
                     case '30D':
                       cutoffDate = now.subtract(const Duration(days: 30));
+                      for (int i = 0; i < 4; i++) {
+                        dateLabels.insert(
+                          0,
+                          DateFormat('MM/dd')
+                              .format(now.subtract(Duration(days: i * 7))),
+                        );
+                      }
                       break;
                     case '3M':
                       cutoffDate = now.subtract(const Duration(days: 90));
+                      for (int i = 0; i < 3; i++) {
+                        dateLabels.insert(
+                          0,
+                          DateFormat('MMMM yyyy')
+                              .format(now.subtract(Duration(days: 30 * i))),
+                        );
+                      }
                       break;
                     case '7D':
                     default:
                       cutoffDate = now.subtract(const Duration(days: 7));
+                      for (int i = 0; i < 7; i++) {
+                        dateLabels.insert(
+                          0,
+                          DateFormat('MM/dd')
+                              .format(now.subtract(Duration(days: i))),
+                        );
+                      }
                   }
 
                   List<QueryDocumentSnapshot> sortedDocs =
@@ -127,7 +150,9 @@ class _DataChartState extends State<DataChart> {
 
                     List wasteEntries = doc['wasteEntries'];
                     wasteEntries.forEach((entry) {
-                      double weight = entry['weight']?.toDouble() ?? 0;
+                      double weight = entry['weight'] is String
+                          ? double.parse(entry['weight'])
+                          : entry['weight']?.toDouble() ?? 0.0;
 
                       switch (entry['wasteType']) {
                         case 'Plastic':
@@ -172,7 +197,7 @@ class _DataChartState extends State<DataChart> {
                         child: LineChart(
                           LineChartData(
                             gridData: gridData,
-                            titlesData: titlesData(sortedDocs),
+                            titlesData: titlesData(dateLabels),
                             borderData: borderData,
                             lineBarsData: [
                               lineChartBarData(plasticSpots, Colors.red),
@@ -180,7 +205,7 @@ class _DataChartState extends State<DataChart> {
                               lineChartBarData(recyclableSpots, Colors.green),
                             ],
                             minX: 0,
-                            maxX: (sortedDocs.length - 1).toDouble(),
+                            maxX: (dateLabels.length - 1).toDouble(),
                             minY: 0,
                             maxY: 10,
                           ),
@@ -195,28 +220,86 @@ class _DataChartState extends State<DataChart> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
-                                _buildTotalBox('Plastic', totalPlastic),
-                                _buildTotalBox('Organic', totalOrganic),
+                                SizedBox(
+                                  width: 160,
+                                  child: _buildTotalBox(
+                                    'Plastic',
+                                    totalPlastic,
+                                    Colors.red,
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 160,
+                                  child: _buildTotalBox(
+                                      'Organic', totalOrganic, Colors.purple),
+                                ),
                               ],
                             ),
-                            const SizedBox(
-                                height:
-                                    16), // Add some spacing between the two rows
+                            const SizedBox(height: 10),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
-                                _buildTotalBox('Recyclable', totalRecyclable),
-                                _buildTotalBox('Other', totalOther),
+                                SizedBox(
+                                  width: 160,
+                                  child: _buildTotalBox('Recyclable',
+                                      totalRecyclable, Colors.green),
+                                ),
+                                SizedBox(
+                                  width: 160,
+                                  child: _buildTotalBox(
+                                      'Other', totalOther, Colors.grey),
+                                ),
                               ],
                             ),
                           ],
                         ),
                       ),
+                      const SizedBox(height: 16),
+                      // Pie chart to show total sums of each waste type
+                      /*PieChart(
+                        dataMap: {
+                          "Plastic": totalPlastic,
+                          "Organic": totalOrganic,
+                          "Recyclable": totalRecyclable,
+                          "Other": totalOther,
+                        },
+                        animationDuration: const Duration(milliseconds: 800),
+                        chartLegendSpacing: 32,
+                        chartRadius: MediaQuery.of(context).size.width / 3,
+                        colorList: [
+                          Colors.red, // Plastic
+                          Colors.purple, // Organic
+                          Colors.green, // Recyclable
+                          Colors.grey, // Other
+                        ],
+                        initialAngleInDegree: 0,
+                        chartType: ChartType.disc,
+                        legendOptions: const LegendOptions(
+                          showLegendsInRow: false,
+                          legendPosition: LegendPosition.right,
+                          showLegends: true,
+                          legendTextStyle: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 14),
+                        ),
+                        chartValuesOptions: const ChartValuesOptions(
+                          showChartValueBackground: false,
+                          showChartValues: true,
+                          chartValueStyle: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14),
+                        ),
+                      ), */
 
                       const SizedBox(height: 16),
+
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF27AE60),
+                          backgroundColor: const Color(0xFF5FAD46),
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                                BorderRadius.circular(10), // Rounded corners
+                          ),
                         ),
                         onPressed: () async {
                           final selectedGoals = await Navigator.push(
@@ -249,13 +332,20 @@ class _DataChartState extends State<DataChart> {
 
   // Build the filter button widget
   Widget _buildFilterButton(String period, String label) {
+    bool isSelected = _selectedPeriod == period;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: _selectedPeriod == period
-              ? const Color(0xFF27AE60)
-              : Colors.grey[300],
+          backgroundColor: isSelected
+              ? const Color(0xFF5FAD46)
+              : Colors.white, // Background color
+          padding: const EdgeInsets.symmetric(
+              vertical: 12.0, horizontal: 28.0), // Optional padding
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10), // Rounded corners
+          ),
         ),
         onPressed: () {
           setState(() {
@@ -265,17 +355,18 @@ class _DataChartState extends State<DataChart> {
         child: Text(
           label,
           style: TextStyle(
-            color: _selectedPeriod == period ? Colors.white : Colors.black,
+            color: isSelected ? Colors.white : Colors.black, // Text color
+            fontWeight: FontWeight.bold, // Optional: bold text
           ),
         ),
       ),
     );
   }
 
-  // Function to create total sum box
-  Widget _buildTotalBox(String title, double total) {
+  // Build total box widget
+  Widget _buildTotalBox(String label, double total, Color color) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -289,87 +380,87 @@ class _DataChartState extends State<DataChart> {
         ],
       ),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            title,
-            style: const TextStyle(fontWeight: FontWeight.bold),
+            label,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16.0,
+            ),
           ),
-          const SizedBox(height: 8),
           Text(
-            '${total.toStringAsFixed(2)} Kg', // Display total with 2 decimal places
-            style: const TextStyle(fontSize: 16),
+            '${total.toStringAsFixed(2)} Kg',
+            style: TextStyle(
+              color: color,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ],
       ),
     );
   }
-}
 
-// Function to create LineChartBarData for each waste type
-LineChartBarData lineChartBarData(List<FlSpot> spots, Color color) {
-  return LineChartBarData(
-    spots: spots,
-    isCurved: true,
-    color: color,
-    dotData: FlDotData(show: false),
-    belowBarData: BarAreaData(show: false),
-    barWidth: 6,
-  );
-}
-
-// Updated grid data to only show horizontal grid lines
-FlGridData get gridData => FlGridData(
-      show: true, // Enable grid data
-      drawHorizontalLine: true, // Show horizontal grid lines
-      horizontalInterval: 2, // Optional: Set interval for horizontal lines
-      getDrawingHorizontalLine: (value) {
-        return FlLine(
-          color: Colors.grey
-              .withOpacity(0.3), // Customize the color of horizontal lines
-          strokeWidth: 1, // Set the width of the horizontal lines
-        );
-      },
-      drawVerticalLine: false, // Disable vertical grid lines
+  // Line chart bar data
+  LineChartBarData lineChartBarData(List<FlSpot> spots, Color color) {
+    return LineChartBarData(
+      spots: spots,
+      isCurved: true,
+      color: color, // Change from colors: [color] to color: color
+      dotData: FlDotData(show: false),
+      belowBarData: BarAreaData(show: false),
+      barWidth: 6,
     );
+  }
 
-// Example titles data for the chart
-FlTitlesData titlesData(List<QueryDocumentSnapshot> sortedDocs) {
-  return FlTitlesData(
-    leftTitles: AxisTitles(
-      sideTitles: SideTitles(showTitles: true),
-    ),
-    bottomTitles: AxisTitles(
-      sideTitles: SideTitles(
-        showTitles: true,
-        reservedSize: 22,
-        getTitlesWidget: (value, meta) {
-          return Text(
-            DateFormat('MM/dd')
-                .format(DateTime.now().subtract(Duration(days: value.toInt()))),
-            style: const TextStyle(fontSize: 10),
-          );
-        },
-      ),
-    ),
-    topTitles: AxisTitles(
-      sideTitles: SideTitles(
-        showTitles: false, // Disable top titles
-      ),
-    ),
-    rightTitles: AxisTitles(
-      sideTitles: SideTitles(
-        showTitles: false, // Disable right titles
-      ),
-    ),
-  );
+  // Line chart grid data
+  FlGridData get gridData => FlGridData(show: true);
+
+  // Line chart border data
+  FlBorderData get borderData => FlBorderData(
+        show: true,
+        border: const Border(
+          bottom: BorderSide(color: Colors.black, width: 1),
+          left: BorderSide(color: Colors.black, width: 1),
+          right: BorderSide(color: Colors.transparent),
+          top: BorderSide(color: Colors.transparent),
+        ),
+      );
+
+  // Titles data with formatted labels
+  FlTitlesData titlesData(List<String> dateLabels) => FlTitlesData(
+        bottomTitles: AxisTitles(
+          sideTitles: SideTitles(
+            showTitles: true,
+            getTitlesWidget: (value, meta) {
+              final index = value.toInt();
+              return SideTitleWidget(
+                axisSide: meta.axisSide,
+                child: Text(
+                  index >= 0 && index < dateLabels.length
+                      ? dateLabels[index]
+                      : '',
+                ),
+              );
+            },
+            interval: 1,
+          ),
+        ),
+        leftTitles: AxisTitles(
+          sideTitles: SideTitles(
+            showTitles: true,
+            interval: 2,
+          ),
+        ),
+        topTitles: AxisTitles(
+          sideTitles: SideTitles(
+            showTitles: false, // Disable top titles
+          ),
+        ),
+        rightTitles: AxisTitles(
+          sideTitles: SideTitles(
+            showTitles: false, // Disable right titles
+          ),
+        ),
+      );
 }
-
-// Example border data for the chart
-FlBorderData get borderData => FlBorderData(
-      show: true,
-      border: Border(
-        left: BorderSide(color: const Color(0xFF27AE60)),
-        bottom: BorderSide(color: const Color(0xFF27AE60)),
-      ),
-    );
