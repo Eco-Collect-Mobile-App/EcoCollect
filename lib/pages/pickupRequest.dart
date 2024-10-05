@@ -27,7 +27,6 @@ class _PickupRequestState extends State<PickupRequest> {
       TextEditingController(); // New city controller
   TextEditingController pickupDateController = TextEditingController();
   TextEditingController pickupTimeController = TextEditingController();
-
   DateTime selectedDate = DateTime.now();
   TimeOfDay selectedTime = TimeOfDay.now();
 
@@ -160,174 +159,521 @@ class _PickupRequestState extends State<PickupRequest> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Pickup Request"),
+        backgroundColor: Color(0xFF27AE60),
+        elevation: 0,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
+        ),
+        title: const Text("Garbage Pick-up Request",
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        centerTitle: true,
       ),
-      body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: [
-              TextFormField(
-                controller: userIdController,
-                readOnly: true,
-                decoration: InputDecoration(labelText: 'User ID'),
-              ),
-              TextFormField(
-                controller: nicController, // New NIC field
-                decoration: InputDecoration(labelText: 'NIC'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your NIC';
-                  }
-                  return null;
-                },
-              ),
-              // Address fields
-              TextFormField(
-                controller: addressNoController, // New address number field
-                decoration: InputDecoration(labelText: 'Address No'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your address number';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: streetController, // New street field
-                decoration: InputDecoration(labelText: 'Street'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your street';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: cityController, // New city field
-                decoration: InputDecoration(labelText: 'City'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your city';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: pickupDateController,
-                readOnly: true,
-                decoration: InputDecoration(
-                  labelText: 'Pickup Date',
-                  suffixIcon: IconButton(
-                    icon: Icon(Icons.calendar_today),
-                    onPressed: () => _selectDate(context),
-                  ),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please select a pickup date';
-                  }
-                  return null;
-                },
-              ),
-              TextFormField(
-                controller: pickupTimeController,
-                readOnly: true,
-                decoration: InputDecoration(
-                  labelText: 'Pickup Time',
-                  suffixIcon: IconButton(
-                    icon: Icon(Icons.access_time),
-                    onPressed: () => _selectTime(context),
-                  ),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please select a pickup time';
-                  }
-                  return null;
-                },
-              ),
-              SizedBox(height: 20),
-              const Text(
-                'Waste Types and Bag Counts:',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              ListView.builder(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                itemCount: wasteEntries.length,
-                itemBuilder: (context, index) {
-                  return Row(
+      resizeToAvoidBottomInset: true,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(25),
+            child: Column(
+              children: [
+                Form(
+                  key: _formKey,
+                  child: Column(
                     children: [
-                      // Waste Type Dropdown
-                      Expanded(
-                        child: DropdownButtonFormField<String>(
-                          value: wasteEntries[index]["wasteType"],
-                          decoration: const InputDecoration(
-                            labelText: 'Waste Type',
+                      // User ID
+                      TextFormField(
+                        controller: userIdController,
+                        readOnly: true,
+                        decoration: const InputDecoration(
+                          labelText: 'User ID',
+                          labelStyle: TextStyle(
+                            color: Color.fromARGB(255, 69, 69, 69),
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
                           ),
-                          items: wasteTypes.map((String type) {
-                            return DropdownMenuItem<String>(
-                              value: type,
-                              child: Text(type),
-                            );
-                          }).toList(),
-                          onChanged: (newValue) {
-                            setState(() {
-                              wasteEntries[index]["wasteType"] = newValue;
-                            });
-                          },
-                          validator: (value) {
-                            if (value == null) {
-                              return 'Please select a waste type';
-                            }
-                            return null;
-                          },
+                          fillColor: Color.fromARGB(
+                              255, 235, 235, 235), // Change fill color
+                          filled: true, // Enable the fill color
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(12)),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(12)),
+                            borderSide: BorderSide(
+                                color: Color.fromARGB(255, 236, 236, 236),
+                                width: 2.0),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(12)),
+                            borderSide: BorderSide(
+                                color: Color(0xFF27AE60), width: 2.0),
+                          ),
+                          contentPadding: EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 16),
                         ),
+                        style: TextStyle(
+                            color: const Color.fromARGB(255, 133, 133, 133)),
                       ),
-                      SizedBox(width: 10),
-                      // Bag Count Field
-                      Expanded(
-                        child: TextFormField(
-                          keyboardType: TextInputType.number,
-                          decoration: InputDecoration(labelText: 'Bag Count'),
-                          onChanged: (value) {
-                            setState(() {
-                              wasteEntries[index]["bagCount"] =
-                                  int.tryParse(value);
-                            });
-                          },
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter the bag count';
-                            }
-                            return null;
-                          },
+                      SizedBox(height: 10),
+
+                      // NIC Field
+                      TextFormField(
+                        controller: nicController,
+                        readOnly: true,
+                        decoration: InputDecoration(
+                          labelText: 'NIC',
+                          labelStyle: TextStyle(
+                            color: Color.fromARGB(255, 69, 69, 69),
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                          ),
+                          fillColor: Color.fromARGB(
+                              255, 235, 235, 235), // Change fill color
+                          filled: true, // Enable the fill color
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(12)),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(12)),
+                            borderSide: BorderSide(
+                                color: Color.fromARGB(255, 236, 236, 236),
+                                width: 2.0),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(12)),
+                            borderSide: BorderSide(
+                                color: Color(0xFF27AE60), width: 2.0),
+                          ),
+                          contentPadding: EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 16),
                         ),
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.delete),
-                        onPressed: () {
-                          setState(() {
-                            wasteEntries.removeAt(index);
-                          });
+                        style: TextStyle(
+                            color: const Color.fromARGB(
+                                255, 133, 133, 133)), // Input text color
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your NIC';
+                          }
+                          return null;
                         },
                       ),
+                      SizedBox(height: 15),
+
+                      TextFormField(
+                        controller: addressNoController,
+                        readOnly: true,
+                        decoration: InputDecoration(
+                          labelText: 'Address No',
+                          labelStyle: TextStyle(
+                            color: Color.fromARGB(255, 69, 69, 69),
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                          ),
+                          fillColor: Color.fromARGB(
+                              255, 235, 235, 235), // Change fill color
+                          filled: true, // Enable the fill color
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(12)),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(12)),
+                            borderSide: BorderSide(
+                                color: Color.fromARGB(255, 236, 236, 236),
+                                width: 2.0),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(12)),
+                            borderSide: BorderSide(
+                                color: Color(0xFF27AE60), width: 2.0),
+                          ),
+                          contentPadding: EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 16),
+                        ),
+                        style: TextStyle(
+                            color: const Color.fromARGB(
+                                255, 133, 133, 133)), // Input text color
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your address number';
+                          }
+                          return null;
+                        },
+                      ),
+                      SizedBox(height: 15),
+
+                      // Street Field
+                      TextFormField(
+                        controller: streetController,
+                        readOnly: true,
+                        decoration: InputDecoration(
+                          labelText: 'Street',
+                          labelStyle: TextStyle(
+                            color: Color.fromARGB(255, 69, 69, 69),
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                          ),
+                          fillColor: Color.fromARGB(
+                              255, 235, 235, 235), // Change fill color
+                          filled: true, // Enable the fill color
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(12)),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(12)),
+                            borderSide: BorderSide(
+                                color: Color.fromARGB(255, 236, 236, 236),
+                                width: 2.0),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(12)),
+                            borderSide: BorderSide(
+                                color: Color(0xFF27AE60), width: 2.0),
+                          ),
+                          contentPadding: EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 16),
+                        ),
+                        style: TextStyle(
+                            color: const Color.fromARGB(
+                                255, 133, 133, 133)), // Input text color
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your street';
+                          }
+                          return null;
+                        },
+                      ),
+                      SizedBox(height: 15),
+
+// City Field
+                      TextFormField(
+                        controller: cityController,
+                        readOnly: true,
+                        decoration: InputDecoration(
+                          labelText: 'City',
+                          labelStyle: TextStyle(
+                            color: Color.fromARGB(255, 69, 69, 69),
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                          ),
+                          fillColor: Color.fromARGB(
+                              255, 235, 235, 235), // Change fill color
+                          filled: true, // Enable the fill color
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(12)),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(12)),
+                            borderSide: BorderSide(
+                                color: Color.fromARGB(255, 236, 236, 236),
+                                width: 2.0),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(12)),
+                            borderSide: BorderSide(
+                                color: Color(0xFF27AE60), width: 2.0),
+                          ),
+                          contentPadding: EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 16),
+                        ),
+                        style: TextStyle(
+                            color: const Color.fromARGB(
+                                255, 133, 133, 133)), // Input text color
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your city';
+                          }
+                          return null;
+                        },
+                      ),
+                      SizedBox(height: 15),
+
+                      // Pickup Date Field
+                      TextFormField(
+                        controller: pickupDateController,
+                        decoration: InputDecoration(
+                          labelText: 'Pickup Date',
+                          labelStyle: TextStyle(
+                            color: Color.fromARGB(255, 37, 37, 37),
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w700,
+                          ),
+                          fillColor: Color.fromARGB(
+                              255, 255, 255, 255), // Change fill color
+                          filled: true, // Enable the fill color
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(12)),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(12)),
+                            borderSide: BorderSide(
+                                color: Color.fromARGB(255, 236, 236, 236),
+                                width: 2.0),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(12)),
+                            borderSide: BorderSide(
+                                color: Color(0xFF27AE60), width: 2.0),
+                          ),
+                          contentPadding: EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 16),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              Icons.calendar_today,
+                              color: Color(
+                                  0xFF5FAD46), // Set your desired color here
+                            ),
+                            onPressed: () => _selectDate(context),
+                          ),
+                        ),
+                        style: TextStyle(
+                            color: const Color.fromARGB(
+                                255, 56, 56, 56)), // Input text color
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please select a pickup date';
+                          }
+                          return null;
+                        },
+                      ),
+                      SizedBox(height: 15),
+
+// Pickup Time Field
+                      TextFormField(
+                        controller: pickupTimeController,
+                        decoration: InputDecoration(
+                          labelText: 'Pickup Time',
+                          labelStyle: TextStyle(
+                            color: Color.fromARGB(255, 37, 37, 37),
+                            fontSize: 16.0,
+                            fontWeight: FontWeight.w700,
+                          ),
+                          fillColor: Color.fromARGB(
+                              255, 255, 255, 255), // Change fill color
+                          filled: true, // Enable the fill color
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(12)),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(12)),
+                            borderSide: BorderSide(
+                                color: Color.fromARGB(255, 236, 236, 236),
+                                width: 2.0),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(12)),
+                            borderSide: BorderSide(
+                                color: Color(0xFF27AE60), width: 2.0),
+                          ),
+                          contentPadding: EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 16),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              Icons.access_time,
+                              color: Color(
+                                  0xFF5FAD46), // Set your desired color here
+                            ),
+                            onPressed: () => _selectTime(context),
+                          ),
+                        ),
+                        style: TextStyle(
+                            color: const Color.fromARGB(
+                                255, 56, 56, 56)), // Input text color
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please select a pickup time';
+                          }
+                          return null;
+                        },
+                      ),
+                      SizedBox(height: 15),
+
+                      const Text(
+                        'Waste Details',
+                        style: TextStyle(
+                          color: Color.fromARGB(255, 61, 61, 61),
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+
+                      // Waste Entries
+                      ...wasteEntries.map((entry) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: DropdownButtonFormField<String>(
+                                  value: entry['wasteType'],
+                                  items: wasteTypes.map((String wasteType) {
+                                    return DropdownMenuItem<String>(
+                                      value: wasteType,
+                                      child: Text(wasteType),
+                                    );
+                                  }).toList(),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      entry['wasteType'] = value;
+                                    });
+                                  },
+                                  decoration: InputDecoration(
+                                    labelText: 'Type',
+                                    labelStyle: TextStyle(
+                                      color: Color.fromARGB(255, 37, 37, 37),
+                                      fontSize: 16.0,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    fillColor: Color.fromARGB(255, 255, 255,
+                                        255), // Change fill color
+                                    filled: true, // Enable the fill color
+                                    border: OutlineInputBorder(
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(12)),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(12)),
+                                      borderSide: BorderSide(
+                                          color: Color.fromARGB(
+                                              255, 236, 236, 236),
+                                          width: 2.0),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(12)),
+                                      borderSide: BorderSide(
+                                          color: Color(0xFF27AE60), width: 2.0),
+                                    ),
+                                    contentPadding: EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 16),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 10),
+                              Expanded(
+                                child: TextFormField(
+                                  keyboardType: TextInputType.number,
+                                  decoration: InputDecoration(
+                                    labelText: 'Bag Count',
+                                    labelStyle: TextStyle(
+                                      color: Color.fromARGB(255, 37, 37, 37),
+                                      fontSize: 16.0,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    fillColor: Color.fromARGB(255, 255, 255,
+                                        255), // Change fill color
+                                    filled: true, // Enable the fill color
+                                    border: OutlineInputBorder(
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(12)),
+                                    ),
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(12)),
+                                      borderSide: BorderSide(
+                                          color: Color.fromARGB(
+                                              255, 236, 236, 236),
+                                          width: 2.0),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(12)),
+                                      borderSide: BorderSide(
+                                          color: Color(0xFF27AE60), width: 2.0),
+                                    ),
+                                    contentPadding: EdgeInsets.symmetric(
+                                        vertical: 10, horizontal: 16),
+                                  ),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      entry['bagCount'] = value;
+                                    });
+                                  },
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Enter bag count';
+                                    }
+                                    return null;
+                                  },
+                                  style: TextStyle(
+                                    color: const Color.fromARGB(
+                                        255, 56, 56, 56), // Input text color
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 10),
+                              IconButton(
+                                icon: Icon(
+                                  Icons.delete,
+                                  color: Color(
+                                      0xFF5FAD46), // Set your desired color here
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    // Remove the current entry from the wasteEntries list
+                                    wasteEntries.remove(entry);
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+
+                      Container(
+                        width: 90, // Set your desired width
+                        height: 30, // Set your desired height
+                        child: ElevatedButton(
+                          onPressed: _addWasteEntry,
+                          child: Text(
+                            '+ Add',
+                            style: TextStyle(
+                              color: Colors.white, // Set text color to white
+                              fontSize: 15, // Set your desired font size
+                              fontWeight: FontWeight
+                                  .w500, // Set your desired font weight
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Color(
+                                0xFF5FAD46), // Set your desired background color here
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(
+                                  18), // Set button curvy with a radius
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      SizedBox(height: 50),
+                      Container(
+                        width: 200, // Set your desired width
+                        height: 40, // Set your desired height
+                        child: ElevatedButton(
+                          onPressed: _submitForm,
+                          child: Text(
+                            'Submit',
+                            style: TextStyle(
+                              color: Colors.white, // Set text color to white
+                              fontSize: 16, // Set your desired font size
+                              fontWeight: FontWeight
+                                  .w700, // Set your desired font weight
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Color(
+                                0xFF5FAD46), // Set your desired background color here
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(
+                                  18), // Set button curvy with a radius
+                            ),
+                          ),
+                        ),
+                      ),
                     ],
-                  );
-                },
-              ),
-              ElevatedButton(
-                onPressed: _addWasteEntry,
-                child: const Text('Add Another Waste Entry'),
-              ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _submitForm,
-                child: const Text('Submit Request'),
-              ),
-            ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
