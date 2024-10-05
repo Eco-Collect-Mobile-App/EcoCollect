@@ -15,6 +15,7 @@ class Sign_In extends StatefulWidget {
 
 class _Sign_InState extends State<Sign_In> {
   final AuthServices _auth = AuthServices();
+  bool _obscurePassword = true;
 
   //form key
   final _formKey = GlobalKey<FormState>();
@@ -55,7 +56,9 @@ class _Sign_InState extends State<Sign_In> {
                         TextFormField(
                           style: const TextStyle(
                               color: Color.fromARGB(255, 0, 0, 0)),
-                          decoration: TextInputDecorarion,
+                          decoration: const InputDecoration(
+                            hintText: "E-mail or Username",
+                          ),
                           validator: (val) => val?.isEmpty == true
                               ? "Enter the valid username or email"
                               : null,
@@ -71,11 +74,29 @@ class _Sign_InState extends State<Sign_In> {
                         ),
                         TextFormField(
                           style: const TextStyle(
-                              color: Color.fromARGB(255, 0, 0, 0)),
-                          decoration: TextInputDecorarion.copyWith(
-                              hintText: "Password"),
-                          validator: (val) =>
-                              val!.length < 6 ? "Enter a valid password" : null,
+                            color: Color.fromARGB(255, 0, 0, 0),
+                          ),
+                          decoration: InputDecoration(
+                            hintText: "Password",
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _obscurePassword
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
+                                color: Colors.grey,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _obscurePassword = !_obscurePassword;
+                                });
+                              },
+                            ),
+                          ),
+                          obscureText:
+                              _obscurePassword, // Hide or show the password
+                          validator: (val) => val != null && val.length < 6
+                              ? "Enter a valid password"
+                              : null,
                           onChanged: (val) {
                             setState(() {
                               password = val;

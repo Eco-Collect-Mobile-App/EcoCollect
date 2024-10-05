@@ -2,29 +2,26 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eco_collect/user_management/services/auth.dart';
 
 class FirebaseService {
-  // Firestore instance
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final AuthServices _authServices =
-      AuthServices(); // Create an instance of AuthServices
+  final AuthServices _authServices = AuthServices();
 
-  // Method to add waste data including NIC and address
   Future<void> addWasteData({
     required String userId,
     required String pickupDate,
     required String pickupTime,
     required List<Map<String, dynamic>> wasteEntries,
-    required String nic, // NIC parameter
+    required String nic,
     required String address,
   }) async {
     try {
-      // Add the waste data including weight to Firestore
       await _firestore.collection('wasteData').add({
-        'userId': userId, // Use the passed userId
+        'userId': userId,
         'pickupDate': pickupDate,
         'pickupTime': pickupTime,
         'wasteEntries': wasteEntries,
-        'nic': nic, // Store NIC
+        'nic': nic,
         'address': address,
+        'createdAt': FieldValue.serverTimestamp(),
       });
     } catch (e) {
       print('Error adding waste data: $e');
@@ -45,7 +42,7 @@ class FirebaseService {
       }
     } catch (e) {
       print('Error retrieving user data: $e');
-      throw e; // Propagate the error if needed
+      throw e;
     }
   }
 
@@ -59,10 +56,11 @@ class FirebaseService {
         throw Exception('No user is currently logged in.');
       }
 
-      // Return only the current user's waste data
+      // Return only the current user's waste data, ordered by createdAt in descending order
       yield* _firestore
           .collection('wasteData')
           .where('userId', isEqualTo: userId)
+          .orderBy('createdAt', descending: true) // Ordering by createdAt
           .snapshots();
     } catch (e) {
       print('Error retrieving data: $e');
@@ -114,8 +112,8 @@ class FirebaseService {
         'pickupDate': pickupDate,
         'pickupTime': pickupTime,
         'wasteEntries': wasteEntries,
-        'nic': nic, // Update NIC
-        'address': address, // Update address number
+        'nic': nic,
+        'address': address,
       });
     } catch (e) {
       throw Exception('Error updating waste data: $e');
