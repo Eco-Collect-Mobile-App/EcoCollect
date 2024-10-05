@@ -23,6 +23,8 @@ dependencies:
   permission_handler: ^11.3.1
   fl_chart: ^0.69.0
   get: ^4.6.6
+  random_string: ^2.3.1
+  fluttertoast: ^8.2.8
   google_generative_ai: ^0.4.6
   flutter_markdown: ^0.7.3+2
   pie_chart: ^5.4.0
@@ -89,6 +91,7 @@ flutter:
           weight: 100
 
   assets:
+    - assets/pic-1.png
     - assets/images/man.png
     - assets/images/google.png
     - assets/images/ecologo.png
