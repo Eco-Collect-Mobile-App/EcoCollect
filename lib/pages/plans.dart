@@ -16,11 +16,20 @@ class WastePlans extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          'Your Saved Plans',
-          style: TextStyle(color: Colors.white),
-        ),
         backgroundColor: const Color(0xFF27AE60),
+        title: const Text(
+          'Your Saved Plans',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(25),
+          ),
+        ),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
@@ -46,19 +55,27 @@ class WastePlans extends StatelessWidget {
               String plan = planData['plan'];
               DateTime date = planData['dateGenerated'].toDate();
 
-              return ListTile(
-                title: Text(
-                    'Plan Generated on ${DateFormat.yMMMd().format(date)}'),
-                subtitle:
-                    Text(plan, maxLines: 2, overflow: TextOverflow.ellipsis),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => GeneratedPlanScreen(plan: plan),
-                    ),
-                  );
-                },
+              return Card(
+                elevation: 5, // Shadow effect
+                margin: EdgeInsets.symmetric(
+                    vertical: 8, horizontal: 16), // Space between cards
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10), // Rounded corners
+                ),
+                child: ListTile(
+                  title: Text(
+                      'Plan Generated on ${DateFormat.yMMMd().format(date)}'),
+                  subtitle:
+                      Text(plan, maxLines: 2, overflow: TextOverflow.ellipsis),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => GeneratedPlanScreen(plan: plan),
+                      ),
+                    );
+                  },
+                ),
               );
             },
           );

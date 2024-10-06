@@ -64,53 +64,54 @@ class _EditComplaintPageState extends State<EditComplaintPage> {
 
   // Function to handle the complaint update logic
   void _updateComplaint() async {
-  if (_formKey.currentState?.validate() ?? false) {
-    // Fetch complaint data from Firestore to ensure correct user is editing it
-    var complaintDoc = await FirebaseFirestore.instance
-        .collection('Complaints')
-        .doc(widget.complaintId)
-        .get();
+    if (_formKey.currentState?.validate() ?? false) {
+      // Fetch complaint data from Firestore to ensure correct user is editing it
+      var complaintDoc = await FirebaseFirestore.instance
+          .collection('Complaints')
+          .doc(widget.complaintId)
+          .get();
 
-    // Check if the current user is the owner of the complaint
-    String complaintUserId = complaintDoc.data()?['userId'];
-    print("Checking user IDs: complaintUserId = $complaintUserId, currentUserId = ${widget.currentUserId}");
+      // Check if the current user is the owner of the complaint
+      String complaintUserId = complaintDoc.data()?['userId'];
+      print(
+          "Checking user IDs: complaintUserId = $complaintUserId, currentUserId = ${widget.currentUserId}");
 
-    // If the current user owns the complaint, allow the update
-    if (complaintUserId.trim() == widget.currentUserId.trim()) {
-      // Create a map of updated complaint data
-      final updatedData = {
-        'Name': _nameController.text,
-        'Email': _emailController.text,
-        'Date': _dateController.text,
-        'Description': _descriptionController.text,
-        'Location': _locationController.text,
-        'Status': _status,
-      };
+      // If the current user owns the complaint, allow the update
+      if (complaintUserId.trim() == widget.currentUserId.trim()) {
+        // Create a map of updated complaint data
+        final updatedData = {
+          'Name': _nameController.text,
+          'Email': _emailController.text,
+          'Date': _dateController.text,
+          'Description': _descriptionController.text,
+          'Location': _locationController.text,
+          'Status': _status,
+        };
 
-      try {
-        // Update the complaint in Firestore
-        await FirebaseFirestore.instance
-            .collection('Complaints')
-            .doc(widget.complaintId)
-            .update(updatedData);
+        try {
+          // Update the complaint in Firestore
+          await FirebaseFirestore.instance
+              .collection('Complaints')
+              .doc(widget.complaintId)
+              .update(updatedData);
 
-        Navigator.pop(context, true); // Return true if update is successful
-      } catch (e) {
-        // Show error message if the update fails
+          Navigator.pop(context, true); // Return true if update is successful
+        } catch (e) {
+          // Show error message if the update fails
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+                content: Text('Failed to update complaint. Please try again.')),
+          );
+        }
+      } else {
+        // Show error if the user is not authorized to edit this complaint
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-              content: Text('Failed to update complaint. Please try again.')),
+              content: Text('You are not authorized to edit this complaint.')),
         );
       }
-    } else {
-      // Show error if the user is not authorized to edit this complaint
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('You are not authorized to edit this complaint.')),
-      );
     }
   }
-}
 
   // Function to handle date selection using a date picker
   Future<void> _selectDate(BuildContext context) async {
@@ -133,21 +134,19 @@ class _EditComplaintPageState extends State<EditComplaintPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xff27AE60),
-        title: const Row(
-          children: [
-            Expanded(
-              // Title
-              child: Text(
-                "Edit Complaint",
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 25.0,
-                    fontWeight: FontWeight.bold),
-              ),
-            ),
-            Icon(Icons.notifications, color: Colors.white) // Notification icon
-          ],
+        backgroundColor: const Color(0xFF27AE60),
+        title: const Text(
+          'Edit Complaint',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(25),
+          ),
         ),
       ),
       body: SingleChildScrollView(
@@ -172,11 +171,13 @@ class _EditComplaintPageState extends State<EditComplaintPage> {
                 _buildTextField(_descriptionController, "Description",
                     maxLines: 4), // Description input field (multiline)
                 const SizedBox(height: 20.0),
-                _buildTextField(_locationController, "Location"), // Location input field
+                _buildTextField(
+                    _locationController, "Location"), // Location input field
                 const SizedBox(height: 30.0),
                 Center(
                   child: ElevatedButton(
-                    onPressed: _updateComplaint, // Call update function on press
+                    onPressed:
+                        _updateComplaint, // Call update function on press
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xff5FAD46),
                       padding: const EdgeInsets.symmetric(

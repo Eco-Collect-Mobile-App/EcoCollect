@@ -5,11 +5,7 @@ import 'package:eco_collect/pages/profile.dart';
 import 'package:eco_collect/pages/dashboard.dart';
 import 'package:eco_collect/pages/datachart.dart';
 import 'package:eco_collect/pages/schedule.dart';
-
 import 'package:eco_collect/pages/pickupReqHistory.dart';
-import 'package:eco_collect/pages/profile.dart';
-import 'package:eco_collect/pages/dashboard.dart';
-import 'package:eco_collect/pages/datachart.dart';
 import 'package:eco_collect/pages/pickupRequest.dart';
 import 'package:eco_collect/pages/trucks.dart';
 import 'package:flutter/material.dart';
@@ -37,7 +33,7 @@ class NavigationMenu extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   buildIcon(controller, Iconsax.clock, 0),
-                  buildIcon(controller, Iconsax.truck, 1),
+                  buildIcon(controller, Iconsax.document_14, 1),
                   buildIcon(controller, Iconsax.chart_214, 2),
                   buildIcon(controller, Iconsax.message_question4, 3),
                   buildIcon(controller, Iconsax.profile_circle, 4),

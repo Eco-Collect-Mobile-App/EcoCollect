@@ -10,7 +10,7 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 
 const String apiKey =
-    'AIzaSyA4U0iw952xWyUvk7_iwGjwccO2HLvFUDk'; // Gemini API key
+    'AIzaSyDSqq-A3lnWzq8GGqFT6cS-2roJp6oVALY'; // Gemini API key
 
 class UserGoals extends StatefulWidget {
   @override
@@ -158,29 +158,33 @@ class _UserGoalsState extends State<UserGoals> {
   Future<void> generatePlan(List<String> selectedGoals) async {
     try {
       if (selectedGoals.isEmpty) {
-        print("No goals selected.");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Please select at least one goal.")),
+        );
         return;
       }
 
-      // Fetch user from the Provider (assuming it's available globally)
       final user = Provider.of<UserModel?>(context, listen: false);
       final String? uid = user?.uid;
 
       if (uid == null) {
-        print("No user found.");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text("No user found. Please log in and try again.")),
+        );
         return;
       }
 
       // Show loading dialog
       showDialog(
         context: context,
-        barrierDismissible: false, // Prevent dismissing by tapping outside
+        barrierDismissible: false,
         builder: (context) => AlertDialog(
           content: Row(
             children: [
-              CircularProgressIndicator(), // Loading spinner
-              SizedBox(width: 20), // Spacing between spinner and text
-              Text("Generating your plan..."), // Loading text
+              CircularProgressIndicator(),
+              SizedBox(width: 20),
+              Text("Generating your plan..."),
             ],
           ),
         ),
@@ -227,9 +231,9 @@ class _UserGoalsState extends State<UserGoals> {
       // Log the prompt to the console
       print("Prompt sent to Gemini API: $prompt");
 
-      // Create the generative model with your API key
+      // Generate the response using the prompt
       final model = GenerativeModel(
-        model: 'gemini-1.5-flash', // Update to the appropriate model name
+        model: 'gemini-1.5-flash',
         apiKey: apiKey,
       );
 
@@ -246,12 +250,10 @@ class _UserGoalsState extends State<UserGoals> {
         'dateGenerated': DateTime.now(),
       });
 
-      print("Plan saved to Firestore.");
-
       // Dismiss the loading dialog
-      Navigator.of(context).pop(); // Dismiss the loading dialog
+      Navigator.of(context, rootNavigator: true).pop();
 
-      // Navigate to the GeneratedPlanScreen to display the generated plan
+      // Navigate to the GeneratedPlanScreen
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -260,7 +262,11 @@ class _UserGoalsState extends State<UserGoals> {
       );
     } catch (e) {
       print("Error generating plan: $e");
-      Navigator.of(context).pop(); // Dismiss the loading dialog on error
+      Navigator.of(context, rootNavigator: true)
+          .pop(); // Dismiss loading dialog
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("An error occurred. Please try again later.")),
+      );
     }
   }
 }
@@ -275,28 +281,28 @@ class GeneratedPlanScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              'Your Personalized Plan',
-              style: TextStyle(color: Colors.white),
-            ),
-            IconButton(
-              icon: const Icon(Icons.download, color: Colors.white),
-              onPressed: () {
-                _downloadPDF(plan); // Trigger the PDF download
-              },
-              tooltip: 'Download PDF',
-            ),
-          ],
-        ),
-        backgroundColor: const Color(0xFF27AE60), // Green color
+        title: Text('Your Personalized Plan',
+            style: TextStyle(color: Colors.white)),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.download, color: Colors.white),
+            onPressed: () => _downloadPDF(plan),
+            tooltip: 'Download PDF',
+          ),
+        ],
+        backgroundColor: Color(0xFF27AE60),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Text(plan, style: const TextStyle(fontSize: 16)),
+        padding: EdgeInsets.all(16.0),
+        child: Markdown(
+          data: plan,
+          styleSheet: MarkdownStyleSheet(
+            h1: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            h2: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            h3: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            p: TextStyle(fontSize: 16),
+            strong: TextStyle(fontWeight: FontWeight.bold),
+          ),
         ),
       ),
     );
@@ -321,9 +327,16 @@ class GeneratedPlanScreen extends StatelessWidget {
       ),
     );
 
-    // Download the generated PDF using the Printing package
-    await Printing.layoutPdf(
-      onLayout: (PdfPageFormat format) async => pdf.save(),
+    // Get the current date and format it
+    String currentDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
+    // Create the filename with the current date
+    String filename = 'waste_management_plan_$currentDate.pdf';
+
+    // Save the generated PDF
+    await Printing.sharePdf(
+      bytes: await pdf.save(),
+      filename: filename,
     );
   }
 }

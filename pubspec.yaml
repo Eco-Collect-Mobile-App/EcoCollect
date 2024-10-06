@@ -34,6 +34,7 @@ dependencies:
   pdf: ^3.11.1
   printing: ^5.13.3
   open_file: ^3.5.8
+  syncfusion_flutter_charts: ^27.1.51
 
 dev_dependencies:
   flutter_test:
@@ -46,7 +47,7 @@ flutter_icons:
   ios: true
   image_path: "assets/icons/icon3.png"
   adaptive_icon_background: "#FFFFFF" #For Android adaptive icons
-  adaptive_icon_foreground: "assets/icons/icon3.png" #For Android adaptive icons
+  adaptive_icon_foreground: "assets/images/icon4.png" #For Android adaptive icons
 
 flutter:
   uses-material-design: true

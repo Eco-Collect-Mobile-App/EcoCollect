@@ -20,8 +20,7 @@ class _ComplaintsHomeState extends State<ComplaintsHome> {
     // Get the current user's ID from Firebase Authentication
     String userId = FirebaseAuth.instance.currentUser?.uid ?? '';
     // Fetch the stream of complaints for the logged-in user
-    complaintStream = DatabaseMethods()
-        .getUserComplaintsStream(userId);
+    complaintStream = DatabaseMethods().getUserComplaintsStream(userId);
     // Update the state to refresh UI with new complaintStream data
     setState(() {});
   }
@@ -38,7 +37,7 @@ class _ComplaintsHomeState extends State<ComplaintsHome> {
     final String currentUserId = user?.uid ?? ''; // Get the user ID
 
     return StreamBuilder<QuerySnapshot>(
-      stream: complaintStream,  // Use the complaint stream to build the list
+      stream: complaintStream, // Use the complaint stream to build the list
       builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
         // Show loading indicator while waiting for data
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -53,7 +52,8 @@ class _ComplaintsHomeState extends State<ComplaintsHome> {
         return ListView.builder(
           itemCount: snapshot.data!.docs.length, // Number of complaints
           itemBuilder: (context, index) {
-            DocumentSnapshot ds = snapshot.data!.docs[index]; // Get complaint data
+            DocumentSnapshot ds =
+                snapshot.data!.docs[index]; // Get complaint data
             if (ds.exists) {
               return Padding(
                 padding: const EdgeInsets.only(bottom: 10.0),
@@ -159,21 +159,19 @@ class _ComplaintsHomeState extends State<ComplaintsHome> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xff27AE60),
-        title: const Row(
-          children: [
-            Expanded(
-              // Title of the page
-              child: Text(
-                "Report an Issue",
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 25.0,
-                    fontWeight: FontWeight.bold),
-              ),
-            ),
-            Icon(Icons.notifications, color: Colors.white)// Notification icon
-          ],
+        backgroundColor: const Color(0xFF27AE60),
+        title: const Text(
+          'Report an Issue',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(25),
+          ),
         ),
       ),
       body: Padding(

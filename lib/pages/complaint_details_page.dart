@@ -48,7 +48,8 @@ class ComplaintDetailsPage extends StatelessWidget {
               onPressed: () {
                 // Perform the delete operation here
                 _deleteComplaint(context); // Call delete function
-                Navigator.popUntil(context, (route) => route.isFirst); // Navigate back to home
+                Navigator.popUntil(
+                    context, (route) => route.isFirst); // Navigate back to home
               },
             ),
           ],
@@ -61,7 +62,7 @@ class ComplaintDetailsPage extends StatelessWidget {
   Future<void> _deleteComplaint(BuildContext context) async {
     try {
       // Call the delete function from DatabaseMethods
-      await DatabaseMethods().deleteComplaint(complaintId,currentUserId);
+      await DatabaseMethods().deleteComplaint(complaintId, currentUserId);
     } catch (e) {
       // Show error message if deletion fails
       ScaffoldMessenger.of(context).showSnackBar(
@@ -74,21 +75,19 @@ class ComplaintDetailsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xff27AE60),
-        title: const Row(
-          children: [
-            Expanded(
-              // Title
-              child: Text(
-                "Complaint Details",
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 25.0,
-                    fontWeight: FontWeight.bold),
-              ),
-            ),
-            Icon(Icons.notifications, color: Colors.white) // Notifications icon
-          ],
+        backgroundColor: const Color(0xFF27AE60),
+        title: const Text(
+          'Complaint Details',
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(25),
+          ),
         ),
       ),
       body: Padding(
