@@ -11,55 +11,45 @@ class PickupRequest extends StatefulWidget {
 
 class _PickupRequestState extends State<PickupRequest> {
   final _formKey = GlobalKey<FormState>();
-
-  // Create an instance of FirebaseService
   final FirebaseService _firebaseService = FirebaseService();
 
-  // User input controllers
   TextEditingController userIdController = TextEditingController();
-  TextEditingController nicController =
-      TextEditingController(); // New NIC controller
-  TextEditingController addressNoController =
-      TextEditingController(); // New address number controller
-  TextEditingController streetController =
-      TextEditingController(); // New street controller
-  TextEditingController cityController =
-      TextEditingController(); // New city controller
+  TextEditingController nicController = TextEditingController();
+  TextEditingController addressNoController = TextEditingController();
+  TextEditingController streetController = TextEditingController();
+  TextEditingController cityController = TextEditingController();
   TextEditingController pickupDateController = TextEditingController();
   TextEditingController pickupTimeController = TextEditingController();
   DateTime selectedDate = DateTime.now();
   TimeOfDay selectedTime = TimeOfDay.now();
 
-  // Waste types and counts (weight is null by default)
   List<Map<String, dynamic>> wasteEntries = [
     {"wasteType": null, "bagCount": null, "weight": null}
   ];
 
   final List<String> wasteTypes = ["Organic", "Plastic", "Recyclable", "Other"];
 
+  Set<String> selectedWasteTypes = Set<String>();
+
   @override
   void initState() {
     super.initState();
-    _setUserId(); // Call the function to set the current user ID
+    _setUserId();
   }
 
-  // Function to get the current user's UID and set it to userIdController
   void _setUserId() async {
-    User? user =
-        FirebaseAuth.instance.currentUser; // Get the current logged-in user
+    User? user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       setState(() {
-        userIdController.text = user.uid; // Set the uid to the controller
+        userIdController.text = user.uid;
       });
 
-      // Fetch user data (NIC and address) from Firestore
       var userData = await _firebaseService.getUserData(user.uid);
       if (userData != null) {
-        nicController.text = userData['nic'] ?? ''; // Set NIC
-        // Set address fields if available
-        addressNoController.text = userData['addressNo'] ?? ''; // Address No
-        streetController.text = userData['street'] ?? ''; // Street
-        cityController.text = userData['city'] ?? ''; // City
+        nicController.text = userData['nic'] ?? '';
+        addressNoController.text = userData['addressNo'] ?? '';
+        streetController.text = userData['street'] ?? '';
+        cityController.text = userData['city'] ?? '';
       }
     }
   }
@@ -100,47 +90,39 @@ class _PickupRequestState extends State<PickupRequest> {
 
   Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
-      // Collect the form data
       String userId = userIdController.text;
-      String nic = nicController.text; // Get NIC
-
-      // Concatenate the address parts into a single string
+      String nic = nicController.text;
       String address =
           '${addressNoController.text}, ${streetController.text}, ${cityController.text}';
-
       String pickupDate = pickupDateController.text;
       String pickupTime = pickupTimeController.text;
 
       try {
-        // Use the FirebaseService to add data to Firestore
         await _firebaseService.addWasteData(
           userId: userId,
           pickupDate: pickupDate,
           pickupTime: pickupTime,
           wasteEntries: wasteEntries,
-          nic: nic, // Pass NIC
-          address: address, // Pass concatenated address
+          nic: nic,
+          address: address,
         );
 
-        // Clear the form
         pickupDateController.clear();
         pickupTimeController.clear();
-        nicController.clear(); // Clear NIC
-        addressNoController.clear(); // Clear Address No
-        streetController.clear(); // Clear Street
-        cityController.clear(); // Clear City
+        nicController.clear();
+        addressNoController.clear();
+        streetController.clear();
+        cityController.clear();
         setState(() {
           wasteEntries = [
             {"wasteType": null, "bagCount": null, "weight": null}
           ];
+          selectedWasteTypes.clear();
         });
 
-        // Show success message
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Form Submitted Successfully')),
         );
-
-        // Navigate to the pickup request history page
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => PickupReqHistory()),
@@ -179,7 +161,6 @@ class _PickupRequestState extends State<PickupRequest> {
                   key: _formKey,
                   child: Column(
                     children: [
-                      // User ID
                       TextFormField(
                         controller: userIdController,
                         readOnly: true,
@@ -190,9 +171,8 @@ class _PickupRequestState extends State<PickupRequest> {
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
                           ),
-                          fillColor: Color.fromARGB(
-                              255, 235, 235, 235), // Change fill color
-                          filled: true, // Enable the fill color
+                          fillColor: Color.fromARGB(255, 235, 235, 235),
+                          filled: true,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.all(Radius.circular(12)),
                           ),
@@ -210,25 +190,22 @@ class _PickupRequestState extends State<PickupRequest> {
                           contentPadding: EdgeInsets.symmetric(
                               vertical: 10, horizontal: 16),
                         ),
-                        style: TextStyle(
-                            color: const Color.fromARGB(255, 133, 133, 133)),
+                        style: const TextStyle(
+                            color: Color.fromARGB(255, 133, 133, 133)),
                       ),
                       SizedBox(height: 10),
-
-                      // NIC Field
                       TextFormField(
                         controller: nicController,
                         readOnly: true,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           labelText: 'NIC',
                           labelStyle: TextStyle(
                             color: Color.fromARGB(255, 69, 69, 69),
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
                           ),
-                          fillColor: Color.fromARGB(
-                              255, 235, 235, 235), // Change fill color
-                          filled: true, // Enable the fill color
+                          fillColor: Color.fromARGB(255, 235, 235, 235),
+                          filled: true,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.all(Radius.circular(12)),
                           ),
@@ -246,9 +223,8 @@ class _PickupRequestState extends State<PickupRequest> {
                           contentPadding: EdgeInsets.symmetric(
                               vertical: 10, horizontal: 16),
                         ),
-                        style: TextStyle(
-                            color: const Color.fromARGB(
-                                255, 133, 133, 133)), // Input text color
+                        style: const TextStyle(
+                            color: Color.fromARGB(255, 133, 133, 133)),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter your NIC';
@@ -256,21 +232,19 @@ class _PickupRequestState extends State<PickupRequest> {
                           return null;
                         },
                       ),
-                      SizedBox(height: 15),
-
+                      const SizedBox(height: 15),
                       TextFormField(
                         controller: addressNoController,
                         readOnly: true,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           labelText: 'Address No',
                           labelStyle: TextStyle(
                             color: Color.fromARGB(255, 69, 69, 69),
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
                           ),
-                          fillColor: Color.fromARGB(
-                              255, 235, 235, 235), // Change fill color
-                          filled: true, // Enable the fill color
+                          fillColor: Color.fromARGB(255, 235, 235, 235),
+                          filled: true,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.all(Radius.circular(12)),
                           ),
@@ -288,9 +262,8 @@ class _PickupRequestState extends State<PickupRequest> {
                           contentPadding: EdgeInsets.symmetric(
                               vertical: 10, horizontal: 16),
                         ),
-                        style: TextStyle(
-                            color: const Color.fromARGB(
-                                255, 133, 133, 133)), // Input text color
+                        style: const TextStyle(
+                            color: Color.fromARGB(255, 133, 133, 133)),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter your address number';
@@ -299,21 +272,18 @@ class _PickupRequestState extends State<PickupRequest> {
                         },
                       ),
                       SizedBox(height: 15),
-
-                      // Street Field
                       TextFormField(
                         controller: streetController,
                         readOnly: true,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           labelText: 'Street',
                           labelStyle: TextStyle(
                             color: Color.fromARGB(255, 69, 69, 69),
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
                           ),
-                          fillColor: Color.fromARGB(
-                              255, 235, 235, 235), // Change fill color
-                          filled: true, // Enable the fill color
+                          fillColor: Color.fromARGB(255, 235, 235, 235),
+                          filled: true,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.all(Radius.circular(12)),
                           ),
@@ -331,9 +301,8 @@ class _PickupRequestState extends State<PickupRequest> {
                           contentPadding: EdgeInsets.symmetric(
                               vertical: 10, horizontal: 16),
                         ),
-                        style: TextStyle(
-                            color: const Color.fromARGB(
-                                255, 133, 133, 133)), // Input text color
+                        style: const TextStyle(
+                            color: Color.fromARGB(255, 133, 133, 133)),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter your street';
@@ -342,21 +311,18 @@ class _PickupRequestState extends State<PickupRequest> {
                         },
                       ),
                       SizedBox(height: 15),
-
-// City Field
                       TextFormField(
                         controller: cityController,
                         readOnly: true,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           labelText: 'City',
                           labelStyle: TextStyle(
                             color: Color.fromARGB(255, 69, 69, 69),
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
                           ),
-                          fillColor: Color.fromARGB(
-                              255, 235, 235, 235), // Change fill color
-                          filled: true, // Enable the fill color
+                          fillColor: Color.fromARGB(255, 235, 235, 235),
+                          filled: true,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.all(Radius.circular(12)),
                           ),
@@ -374,9 +340,8 @@ class _PickupRequestState extends State<PickupRequest> {
                           contentPadding: EdgeInsets.symmetric(
                               vertical: 10, horizontal: 16),
                         ),
-                        style: TextStyle(
-                            color: const Color.fromARGB(
-                                255, 133, 133, 133)), // Input text color
+                        style: const TextStyle(
+                            color: Color.fromARGB(255, 133, 133, 133)),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter your city';
@@ -385,48 +350,43 @@ class _PickupRequestState extends State<PickupRequest> {
                         },
                       ),
                       SizedBox(height: 15),
-
-                      // Pickup Date Field
                       TextFormField(
                         controller: pickupDateController,
                         decoration: InputDecoration(
                           labelText: 'Pickup Date',
-                          labelStyle: TextStyle(
+                          labelStyle: const TextStyle(
                             color: Color.fromARGB(255, 37, 37, 37),
                             fontSize: 16.0,
                             fontWeight: FontWeight.w700,
                           ),
-                          fillColor: Color.fromARGB(
-                              255, 255, 255, 255), // Change fill color
-                          filled: true, // Enable the fill color
-                          border: OutlineInputBorder(
+                          fillColor: const Color.fromARGB(255, 255, 255, 255),
+                          filled: true,
+                          border: const OutlineInputBorder(
                             borderRadius: BorderRadius.all(Radius.circular(12)),
                           ),
-                          enabledBorder: OutlineInputBorder(
+                          enabledBorder: const OutlineInputBorder(
                             borderRadius: BorderRadius.all(Radius.circular(12)),
                             borderSide: BorderSide(
                                 color: Color.fromARGB(255, 236, 236, 236),
                                 width: 2.0),
                           ),
-                          focusedBorder: OutlineInputBorder(
+                          focusedBorder: const OutlineInputBorder(
                             borderRadius: BorderRadius.all(Radius.circular(12)),
                             borderSide: BorderSide(
                                 color: Color(0xFF27AE60), width: 2.0),
                           ),
-                          contentPadding: EdgeInsets.symmetric(
+                          contentPadding: const EdgeInsets.symmetric(
                               vertical: 10, horizontal: 16),
                           suffixIcon: IconButton(
-                            icon: Icon(
+                            icon: const Icon(
                               Icons.calendar_today,
-                              color: Color(
-                                  0xFF5FAD46), // Set your desired color here
+                              color: Color(0xFF5FAD46),
                             ),
                             onPressed: () => _selectDate(context),
                           ),
                         ),
-                        style: TextStyle(
-                            color: const Color.fromARGB(
-                                255, 56, 56, 56)), // Input text color
+                        style: const TextStyle(
+                            color: Color.fromARGB(255, 56, 56, 56)),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please select a pickup date';
@@ -435,48 +395,43 @@ class _PickupRequestState extends State<PickupRequest> {
                         },
                       ),
                       SizedBox(height: 15),
-
-// Pickup Time Field
                       TextFormField(
                         controller: pickupTimeController,
                         decoration: InputDecoration(
                           labelText: 'Pickup Time',
-                          labelStyle: TextStyle(
+                          labelStyle: const TextStyle(
                             color: Color.fromARGB(255, 37, 37, 37),
                             fontSize: 16.0,
                             fontWeight: FontWeight.w700,
                           ),
-                          fillColor: Color.fromARGB(
-                              255, 255, 255, 255), // Change fill color
-                          filled: true, // Enable the fill color
-                          border: OutlineInputBorder(
+                          fillColor: Color.fromARGB(255, 255, 255, 255),
+                          filled: true,
+                          border: const OutlineInputBorder(
                             borderRadius: BorderRadius.all(Radius.circular(12)),
                           ),
-                          enabledBorder: OutlineInputBorder(
+                          enabledBorder: const OutlineInputBorder(
                             borderRadius: BorderRadius.all(Radius.circular(12)),
                             borderSide: BorderSide(
                                 color: Color.fromARGB(255, 236, 236, 236),
                                 width: 2.0),
                           ),
-                          focusedBorder: OutlineInputBorder(
+                          focusedBorder: const OutlineInputBorder(
                             borderRadius: BorderRadius.all(Radius.circular(12)),
                             borderSide: BorderSide(
                                 color: Color(0xFF27AE60), width: 2.0),
                           ),
-                          contentPadding: EdgeInsets.symmetric(
+                          contentPadding: const EdgeInsets.symmetric(
                               vertical: 10, horizontal: 16),
                           suffixIcon: IconButton(
-                            icon: Icon(
+                            icon: const Icon(
                               Icons.access_time,
-                              color: Color(
-                                  0xFF5FAD46), // Set your desired color here
+                              color: Color(0xFF5FAD46),
                             ),
                             onPressed: () => _selectTime(context),
                           ),
                         ),
-                        style: TextStyle(
-                            color: const Color.fromARGB(
-                                255, 56, 56, 56)), // Input text color
+                        style: const TextStyle(
+                            color: Color.fromARGB(255, 56, 56, 56)),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please select a pickup time';
@@ -485,7 +440,6 @@ class _PickupRequestState extends State<PickupRequest> {
                         },
                       ),
                       SizedBox(height: 15),
-
                       const Text(
                         'Waste Details',
                         style: TextStyle(
@@ -494,8 +448,6 @@ class _PickupRequestState extends State<PickupRequest> {
                           fontWeight: FontWeight.w700,
                         ),
                       ),
-
-                      // Waste Entries
                       ...wasteEntries.map((entry) {
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -508,23 +460,33 @@ class _PickupRequestState extends State<PickupRequest> {
                                     return DropdownMenuItem<String>(
                                       value: wasteType,
                                       child: Text(wasteType),
+                                      enabled: !selectedWasteTypes
+                                              .contains(wasteType) ||
+                                          wasteType == entry['wasteType'],
                                     );
                                   }).toList(),
                                   onChanged: (value) {
                                     setState(() {
+                                      if (entry['wasteType'] != null) {
+                                        selectedWasteTypes
+                                            .remove(entry['wasteType']);
+                                      }
                                       entry['wasteType'] = value;
+                                      if (value != null) {
+                                        selectedWasteTypes.add(value);
+                                      }
                                     });
                                   },
-                                  decoration: InputDecoration(
+                                  decoration: const InputDecoration(
                                     labelText: 'Type',
                                     labelStyle: TextStyle(
                                       color: Color.fromARGB(255, 37, 37, 37),
                                       fontSize: 16.0,
                                       fontWeight: FontWeight.bold,
                                     ),
-                                    fillColor: Color.fromARGB(255, 255, 255,
-                                        255), // Change fill color
-                                    filled: true, // Enable the fill color
+                                    fillColor:
+                                        Color.fromARGB(255, 255, 255, 255),
+                                    filled: true,
                                     border: OutlineInputBorder(
                                       borderRadius:
                                           BorderRadius.all(Radius.circular(12)),
@@ -546,22 +508,28 @@ class _PickupRequestState extends State<PickupRequest> {
                                     contentPadding: EdgeInsets.symmetric(
                                         vertical: 10, horizontal: 16),
                                   ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please select a waste type';
+                                    }
+                                    return null;
+                                  },
                                 ),
                               ),
                               SizedBox(width: 10),
                               Expanded(
                                 child: TextFormField(
                                   keyboardType: TextInputType.number,
-                                  decoration: InputDecoration(
+                                  decoration: const InputDecoration(
                                     labelText: 'Bag Count',
                                     labelStyle: TextStyle(
                                       color: Color.fromARGB(255, 37, 37, 37),
                                       fontSize: 16.0,
                                       fontWeight: FontWeight.bold,
                                     ),
-                                    fillColor: Color.fromARGB(255, 255, 255,
-                                        255), // Change fill color
-                                    filled: true, // Enable the fill color
+                                    fillColor:
+                                        Color.fromARGB(255, 255, 255, 255),
+                                    filled: true,
                                     border: OutlineInputBorder(
                                       borderRadius:
                                           BorderRadius.all(Radius.circular(12)),
@@ -592,24 +560,28 @@ class _PickupRequestState extends State<PickupRequest> {
                                     if (value == null || value.isEmpty) {
                                       return 'Enter bag count';
                                     }
+                                    if (int.tryParse(value) == null) {
+                                      return 'Please enter a valid integer';
+                                    }
                                     return null;
                                   },
-                                  style: TextStyle(
-                                    color: const Color.fromARGB(
-                                        255, 56, 56, 56), // Input text color
+                                  style: const TextStyle(
+                                    color: Color.fromARGB(255, 56, 56, 56),
                                   ),
                                 ),
                               ),
                               SizedBox(width: 10),
                               IconButton(
-                                icon: Icon(
+                                icon: const Icon(
                                   Icons.delete,
-                                  color: Color(
-                                      0xFF5FAD46), // Set your desired color here
+                                  color: Color(0xFF5FAD46),
                                 ),
                                 onPressed: () {
                                   setState(() {
-                                    // Remove the current entry from the wasteEntries list
+                                    if (entry['wasteType'] != null) {
+                                      selectedWasteTypes
+                                          .remove(entry['wasteType']);
+                                    }
                                     wasteEntries.remove(entry);
                                   });
                                 },
@@ -618,53 +590,45 @@ class _PickupRequestState extends State<PickupRequest> {
                           ),
                         );
                       }).toList(),
-
                       Container(
-                        width: 90, // Set your desired width
-                        height: 30, // Set your desired height
+                        width: 90,
+                        height: 30,
                         child: ElevatedButton(
                           onPressed: _addWasteEntry,
                           child: Text(
                             '+ Add',
                             style: TextStyle(
-                              color: Colors.white, // Set text color to white
-                              fontSize: 15, // Set your desired font size
-                              fontWeight: FontWeight
-                                  .w500, // Set your desired font weight
+                              color: Colors.white,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(
-                                0xFF5FAD46), // Set your desired background color here
+                            backgroundColor: const Color(0xFF5FAD46),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                  18), // Set button curvy with a radius
+                              borderRadius: BorderRadius.circular(18),
                             ),
                           ),
                         ),
                       ),
-
                       SizedBox(height: 50),
                       Container(
-                        width: 200, // Set your desired width
-                        height: 40, // Set your desired height
+                        width: 200,
+                        height: 40,
                         child: ElevatedButton(
                           onPressed: _submitForm,
                           child: Text(
                             'Submit',
                             style: TextStyle(
-                              color: Colors.white, // Set text color to white
-                              fontSize: 16, // Set your desired font size
-                              fontWeight: FontWeight
-                                  .w700, // Set your desired font weight
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(
-                                0xFF5FAD46), // Set your desired background color here
+                            backgroundColor: const Color(0xFF5FAD46),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                  18), // Set button curvy with a radius
+                              borderRadius: BorderRadius.circular(18),
                             ),
                           ),
                         ),

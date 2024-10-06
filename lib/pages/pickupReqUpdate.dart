@@ -4,9 +4,8 @@ import 'package:eco_collect/service/firebase_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class PickupReqUpdate extends StatefulWidget {
-  final String requestId; // Pass the existing request ID to update
-  final Map<String, dynamic>
-      existingData; // New parameter to hold existing data
+  final String requestId;
+  final Map<String, dynamic> existingData;
 
   const PickupReqUpdate({
     Key? key,
@@ -123,9 +122,8 @@ class _PickupReqUpdateState extends State<PickupReqUpdate> {
 
         _showSnackBar('Form Updated Successfully');
 
-        // Add a small delay before navigating back to allow time to show the success message
         Future.delayed(const Duration(seconds: 2), () {
-          Navigator.pop(context); // Pop the screen after showing the message
+          Navigator.pop(context);
         });
       } catch (e) {
         print('Failed to update form: $e');
@@ -173,86 +171,8 @@ class _PickupReqUpdateState extends State<PickupReqUpdate> {
                             fontSize: 18,
                             fontWeight: FontWeight.w700,
                           ),
-                          fillColor: Color.fromARGB(
-                              255, 235, 235, 235), // Change fill color
-                          filled: true, // Enable the fill color
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(12)),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(12)),
-                            borderSide: BorderSide(
-                                color: Color.fromARGB(255, 236, 236, 236),
-                                width: 2.0),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(12)),
-                            borderSide: BorderSide(
-                                color: Color(0xFF27AE60), width: 2.0),
-                          ),
-                          contentPadding: EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 16),
-                        ),
-                        style: TextStyle(
-                            color: const Color.fromARGB(255, 133, 133, 133)),
-                      ),
-                      SizedBox(height: 10),
-
-                      TextFormField(
-                        controller: nicController,
-                        readOnly: true,
-                        decoration: InputDecoration(
-                          labelText: 'NIC',
-                          labelStyle: TextStyle(
-                            color: Color.fromARGB(255, 69, 69, 69),
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                          ),
-                          fillColor: Color.fromARGB(
-                              255, 235, 235, 235), // Change fill color
-                          filled: true, // Enable the fill color
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(12)),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(12)),
-                            borderSide: BorderSide(
-                                color: Color.fromARGB(255, 236, 236, 236),
-                                width: 2.0),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.all(Radius.circular(12)),
-                            borderSide: BorderSide(
-                                color: Color(0xFF27AE60), width: 2.0),
-                          ),
-                          contentPadding: EdgeInsets.symmetric(
-                              vertical: 10, horizontal: 16),
-                        ),
-                        style: TextStyle(
-                            color: const Color.fromARGB(
-                                255, 133, 133, 133)), // Input text color
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your NIC';
-                          }
-                          return null;
-                        },
-                      ),
-                      SizedBox(height: 15),
-
-                      TextFormField(
-                        controller: addressController,
-                        readOnly: true,
-                        decoration: const InputDecoration(
-                          labelText: 'Address',
-                          labelStyle: TextStyle(
-                            color: Color.fromARGB(255, 69, 69, 69),
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                          ),
-                          fillColor: Color.fromARGB(
-                              255, 235, 235, 235), // Change fill color
-                          filled: true, // Enable the fill color
+                          fillColor: Color.fromARGB(255, 235, 235, 235),
+                          filled: true,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.all(Radius.circular(12)),
                           ),
@@ -271,8 +191,79 @@ class _PickupReqUpdateState extends State<PickupReqUpdate> {
                               vertical: 10, horizontal: 16),
                         ),
                         style: const TextStyle(
-                            color: Color.fromARGB(
-                                255, 133, 133, 133)), // Input text color
+                            color: Color.fromARGB(255, 133, 133, 133)),
+                      ),
+                      SizedBox(height: 10),
+                      TextFormField(
+                        controller: nicController,
+                        readOnly: true,
+                        decoration: const InputDecoration(
+                          labelText: 'NIC',
+                          labelStyle: TextStyle(
+                            color: Color.fromARGB(255, 69, 69, 69),
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                          ),
+                          fillColor: Color.fromARGB(255, 235, 235, 235),
+                          filled: true,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(12)),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(12)),
+                            borderSide: BorderSide(
+                                color: Color.fromARGB(255, 236, 236, 236),
+                                width: 2.0),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(12)),
+                            borderSide: BorderSide(
+                                color: Color(0xFF27AE60), width: 2.0),
+                          ),
+                          contentPadding: EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 16),
+                        ),
+                        style: const TextStyle(
+                            color: Color.fromARGB(255, 133, 133, 133)),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your NIC';
+                          }
+                          return null;
+                        },
+                      ),
+                      SizedBox(height: 15),
+                      TextFormField(
+                        controller: addressController,
+                        readOnly: true,
+                        decoration: const InputDecoration(
+                          labelText: 'Address',
+                          labelStyle: TextStyle(
+                            color: Color.fromARGB(255, 69, 69, 69),
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                          ),
+                          fillColor: Color.fromARGB(255, 235, 235, 235),
+                          filled: true,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(12)),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(12)),
+                            borderSide: BorderSide(
+                                color: Color.fromARGB(255, 236, 236, 236),
+                                width: 2.0),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(12)),
+                            borderSide: BorderSide(
+                                color: Color(0xFF27AE60), width: 2.0),
+                          ),
+                          contentPadding: EdgeInsets.symmetric(
+                              vertical: 10, horizontal: 16),
+                        ),
+                        style: const TextStyle(
+                            color: Color.fromARGB(255, 133, 133, 133)),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter Address';
@@ -281,47 +272,43 @@ class _PickupReqUpdateState extends State<PickupReqUpdate> {
                         },
                       ),
                       const SizedBox(height: 16),
-
                       TextFormField(
                         controller: pickupDateController,
                         decoration: InputDecoration(
                           labelText: 'Pickup Date',
-                          labelStyle: TextStyle(
+                          labelStyle: const TextStyle(
                             color: Color.fromARGB(255, 37, 37, 37),
                             fontSize: 16.0,
                             fontWeight: FontWeight.w700,
                           ),
-                          fillColor: Color.fromARGB(
-                              255, 255, 255, 255), // Change fill color
-                          filled: true, // Enable the fill color
-                          border: OutlineInputBorder(
+                          fillColor: const Color.fromARGB(255, 255, 255, 255),
+                          filled: true,
+                          border: const OutlineInputBorder(
                             borderRadius: BorderRadius.all(Radius.circular(12)),
                           ),
-                          enabledBorder: OutlineInputBorder(
+                          enabledBorder: const OutlineInputBorder(
                             borderRadius: BorderRadius.all(Radius.circular(12)),
                             borderSide: BorderSide(
                                 color: Color.fromARGB(255, 236, 236, 236),
                                 width: 2.0),
                           ),
-                          focusedBorder: OutlineInputBorder(
+                          focusedBorder: const OutlineInputBorder(
                             borderRadius: BorderRadius.all(Radius.circular(12)),
                             borderSide: BorderSide(
                                 color: Color(0xFF27AE60), width: 2.0),
                           ),
-                          contentPadding: EdgeInsets.symmetric(
+                          contentPadding: const EdgeInsets.symmetric(
                               vertical: 10, horizontal: 16),
                           suffixIcon: IconButton(
-                            icon: Icon(
+                            icon: const Icon(
                               Icons.calendar_today,
-                              color: Color(
-                                  0xFF5FAD46), // Set your desired color here
+                              color: Color(0xFF5FAD46),
                             ),
                             onPressed: () => _selectDate(context),
                           ),
                         ),
-                        style: TextStyle(
-                            color: const Color.fromARGB(
-                                255, 56, 56, 56)), // Input text color
+                        style: const TextStyle(
+                            color: Color.fromARGB(255, 56, 56, 56)),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please select a pickup date';
@@ -329,48 +316,44 @@ class _PickupReqUpdateState extends State<PickupReqUpdate> {
                           return null;
                         },
                       ),
-                      SizedBox(height: 16), // Added spacing
-
+                      SizedBox(height: 16),
                       TextFormField(
                         controller: pickupTimeController,
                         decoration: InputDecoration(
                           labelText: 'Pickup Time',
-                          labelStyle: TextStyle(
+                          labelStyle: const TextStyle(
                             color: Color.fromARGB(255, 37, 37, 37),
                             fontSize: 16.0,
                             fontWeight: FontWeight.w700,
                           ),
-                          fillColor: Color.fromARGB(
-                              255, 255, 255, 255), // Change fill color
-                          filled: true, // Enable the fill color
-                          border: OutlineInputBorder(
+                          fillColor: const Color.fromARGB(255, 255, 255, 255),
+                          filled: true,
+                          border: const OutlineInputBorder(
                             borderRadius: BorderRadius.all(Radius.circular(12)),
                           ),
-                          enabledBorder: OutlineInputBorder(
+                          enabledBorder: const OutlineInputBorder(
                             borderRadius: BorderRadius.all(Radius.circular(12)),
                             borderSide: BorderSide(
                                 color: Color.fromARGB(255, 236, 236, 236),
                                 width: 2.0),
                           ),
-                          focusedBorder: OutlineInputBorder(
+                          focusedBorder: const OutlineInputBorder(
                             borderRadius: BorderRadius.all(Radius.circular(12)),
                             borderSide: BorderSide(
                                 color: Color(0xFF27AE60), width: 2.0),
                           ),
-                          contentPadding: EdgeInsets.symmetric(
+                          contentPadding: const EdgeInsets.symmetric(
                               vertical: 10, horizontal: 16),
                           suffixIcon: IconButton(
-                            icon: Icon(
+                            icon: const Icon(
                               Icons.access_time,
-                              color: Color(
-                                  0xFF5FAD46), // Set your desired color here
+                              color: Color(0xFF5FAD46),
                             ),
                             onPressed: () => _selectTime(context),
                           ),
                         ),
-                        style: TextStyle(
-                            color: const Color.fromARGB(
-                                255, 56, 56, 56)), // Input text color
+                        style: const TextStyle(
+                            color: Color.fromARGB(255, 56, 56, 56)),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please select a pickup time';
@@ -378,8 +361,7 @@ class _PickupReqUpdateState extends State<PickupReqUpdate> {
                           return null;
                         },
                       ),
-                      SizedBox(height: 16), // Added spacing
-
+                      SizedBox(height: 16),
                       const Text(
                         'Waste Details',
                         style: TextStyle(
@@ -405,9 +387,9 @@ class _PickupReqUpdateState extends State<PickupReqUpdate> {
                                       fontSize: 16.0,
                                       fontWeight: FontWeight.w700,
                                     ),
-                                    fillColor: Color.fromARGB(255, 255, 255,
-                                        255), // Change fill color
-                                    filled: true, // Enable the fill color
+                                    fillColor:
+                                        Color.fromARGB(255, 255, 255, 255),
+                                    filled: true,
                                     border: OutlineInputBorder(
                                       borderRadius:
                                           BorderRadius.all(Radius.circular(12)),
@@ -453,16 +435,16 @@ class _PickupReqUpdateState extends State<PickupReqUpdate> {
                               Expanded(
                                 child: TextFormField(
                                   keyboardType: TextInputType.number,
-                                  decoration: InputDecoration(
+                                  decoration: const InputDecoration(
                                     labelText: 'Bag Count',
                                     labelStyle: TextStyle(
                                       color: Color.fromARGB(255, 37, 37, 37),
                                       fontSize: 16.0,
                                       fontWeight: FontWeight.w700,
                                     ),
-                                    fillColor: Color.fromARGB(255, 255, 255,
-                                        255), // Change fill color
-                                    filled: true, // Enable the fill color
+                                    fillColor:
+                                        Color.fromARGB(255, 255, 255, 255),
+                                    filled: true,
                                     border: OutlineInputBorder(
                                       borderRadius:
                                           BorderRadius.all(Radius.circular(12)),
@@ -501,18 +483,16 @@ class _PickupReqUpdateState extends State<PickupReqUpdate> {
                                     }
                                     return null;
                                   },
-                                  style: TextStyle(
-                                    color: const Color.fromARGB(
-                                        255, 56, 56, 56), // Input text color
+                                  style: const TextStyle(
+                                    color: Color.fromARGB(255, 56, 56, 56),
                                   ),
                                 ),
                               ),
                               SizedBox(width: 16),
                               IconButton(
-                                icon: Icon(
+                                icon: const Icon(
                                   Icons.delete,
-                                  color: Color(
-                                      0xFF5FAD46), // Set your desired color here
+                                  color: Color(0xFF5FAD46),
                                 ),
                                 onPressed: () => _removeWasteEntry(index),
                               ),
@@ -529,44 +509,37 @@ class _PickupReqUpdateState extends State<PickupReqUpdate> {
                           child: Text(
                             '+ Add',
                             style: TextStyle(
-                              color: Colors.white, // Set text color to white
-                              fontSize: 15, // Set your desired font size
-                              fontWeight: FontWeight
-                                  .w500, // Set your desired font weight
+                              color: Colors.white,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(
-                                0xFF5FAD46), // Set your desired background color here
+                            backgroundColor: Color(0xFF5FAD46),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                  18), // Set button curvy with a radius
+                              borderRadius: BorderRadius.circular(18),
                             ),
                           ),
                         ),
                       ),
-
                       SizedBox(height: 150),
                       Container(
-                        width: 200, // Set your desired width
+                        width: 200,
                         height: 40,
                         child: ElevatedButton(
                           onPressed: _submitForm,
                           child: Text(
                             'Update Request',
                             style: TextStyle(
-                              color: Colors.white, // Set text color to white
-                              fontSize: 15, // Set your desired font size
-                              fontWeight: FontWeight
-                                  .w500, // Set your desired font weight
+                              color: Colors.white,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(
-                                0xFF5FAD46), // Set your desired background color here
+                            backgroundColor: Color(0xFF5FAD46),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                  18), // Set button curvy with a radius
+                              borderRadius: BorderRadius.circular(18),
                             ),
                           ),
                         ),

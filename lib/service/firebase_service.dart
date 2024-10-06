@@ -29,7 +29,7 @@ class FirebaseService {
     }
   }
 
-  // Method to retrieve user data from Firestore using user ID
+  //retrieve user data from Firestore using user ID
   Future<Map<String, dynamic>?> getUserData(String userId) async {
     try {
       DocumentSnapshot doc =
@@ -46,29 +46,28 @@ class FirebaseService {
     }
   }
 
-  // Method to retrieve waste data from Firestore for the current logged-in user
+  //retrieve waste data from Firestore for the current logged-in user
   Stream<QuerySnapshot> getWasteRequestsForUser() async* {
     try {
-      String? userId =
-          await _authServices.getUserUid(); // Get the current user's UID
+      String? userId = await _authServices.getUserUid();
 
       if (userId == null) {
         throw Exception('No user is currently logged in.');
       }
 
-      // Return only the current user's waste data, ordered by createdAt in descending order
+      //return only the current user's waste data, ordered by createdAt in descending order
       yield* _firestore
           .collection('wasteData')
           .where('userId', isEqualTo: userId)
-          .orderBy('createdAt', descending: true) // Ordering by createdAt
+          .orderBy('createdAt', descending: true)
           .snapshots();
     } catch (e) {
       print('Error retrieving data: $e');
-      throw e; // Propagate the error if needed
+      throw e;
     }
   }
 
-  // Method to delete a waste request by ID
+  //delete a waste request by ID
   Future<void> deleteWasteRequest(String requestId) async {
     try {
       await _firestore.collection('wasteData').doc(requestId).delete();
@@ -79,7 +78,7 @@ class FirebaseService {
     }
   }
 
-  // Method to retrieve waste data for a specific request ID
+  //retrieve waste data for a specific request ID
   Future<Map<String, dynamic>?> getWasteData(String requestId) async {
     try {
       DocumentSnapshot doc =
@@ -92,11 +91,11 @@ class FirebaseService {
       }
     } catch (e) {
       print('Error retrieving waste data: $e');
-      throw e; // Propagate the error if needed
+      throw e;
     }
   }
 
-  // Update waste data by request ID
+  //update waste data by request ID
   Future<void> updateWasteData({
     required String requestId,
     required String userId,
@@ -104,7 +103,7 @@ class FirebaseService {
     required String pickupTime,
     required List<Map<String, dynamic>> wasteEntries,
     required String nic,
-    required String address, // New city parameter for update
+    required String address,
   }) async {
     try {
       await _firestore.collection('wasteData').doc(requestId).update({

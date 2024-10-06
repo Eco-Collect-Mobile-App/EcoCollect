@@ -34,7 +34,6 @@ class _PickupReqReportState extends State<PickupReqReport> {
     final monthIndex = months.indexOf(month) + 1;
 
     try {
-      // Listen to the stream and get the first value
       final snapshot = await _firebaseService.getWasteRequestsForUser().first;
 
       setState(() {
@@ -72,12 +71,10 @@ class _PickupReqReportState extends State<PickupReqReport> {
       ),
     );
 
-    // Get the Downloads directory
-    final output =
-        Directory('/storage/emulated/0/Download'); // Path to Downloads folder
+//download the report to the donloads folder
+    final output = Directory('/storage/emulated/0/Download');
     final file = File("${output.path}/pickup_report_$selectedMonth.pdf");
 
-    // Create the file if it doesn't exist
     if (!(await output.exists())) {
       await output.create(recursive: true);
     }
@@ -93,13 +90,10 @@ class _PickupReqReportState extends State<PickupReqReport> {
     Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
     List wasteEntries = data['wasteEntries'] ?? [];
 
-    // Total bags and weight per waste type, ignoring null weights
     Map<String, double> wasteTotals = {};
     for (var entry in wasteEntries) {
       String wasteType = entry['wasteType'];
       double weight = entry['weight']?.toDouble() ?? 0;
-
-      // Only include entries with non-null weights
       if (weight > 0) {
         wasteTotals[wasteType] = (wasteTotals[wasteType] ?? 0) + weight;
       }
@@ -113,12 +107,16 @@ class _PickupReqReportState extends State<PickupReqReport> {
         pw.Text("Pickup Time: ${data['pickupTime']}"),
         pw.SizedBox(height: 10),
         pw.Text("Waste Details:"),
-        pw.Bullet(
-          text:
-              "Total Bags: ${wasteEntries.fold(0, (sum, e) => sum + (e['bagCount'] != null ? int.parse(e['bagCount']) : 0))}",
+        pw.Table.fromTextArray(
+          headers: ['Waste Type', 'Bags', 'Weight (kg)'],
+          data: wasteEntries.map((entry) {
+            return [
+              entry['wasteType'],
+              entry['bagCount']?.toString() ?? '0',
+              entry['weight']?.toString() ?? '0.0'
+            ];
+          }).toList(),
         ),
-        for (var wasteType in wasteTotals.keys)
-          pw.Bullet(text: "$wasteType: ${wasteTotals[wasteType]} kg"),
         pw.SizedBox(height: 10),
       ],
     );
@@ -158,45 +156,41 @@ class _PickupReqReportState extends State<PickupReqReport> {
                   value: month,
                   child: Text(
                     month,
-                    style: TextStyle(
-                      color: Colors.black, // Change text color if needed
+                    style: const TextStyle(
+                      color: Colors.black,
                     ),
                   ),
                 );
               }).toList(),
-              style: TextStyle(
-                color: Colors.black, // Dropdown text color
+              style: const TextStyle(
+                color: Colors.black,
               ),
-              dropdownColor:
-                  Color(0xFFE7EBE8), // Background color of the dropdown
-              iconEnabledColor: Colors.black, // Color of the dropdown arrow
-              iconDisabledColor:
-                  Colors.grey, // Color of the dropdown arrow when disabled
+              dropdownColor: Color.fromARGB(255, 208, 208, 208),
+              iconEnabledColor: Colors.black,
+              iconDisabledColor: Colors.grey,
             ),
             SizedBox(height: 20),
             Expanded(
               child: filteredDocs.isEmpty
                   ? Center(
                       child: Text("No records for $selectedMonth.",
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontSize: 18, fontWeight: FontWeight.bold)))
                   : ListView(
                       children: filteredDocs.map((DocumentSnapshot doc) {
                         Map<String, dynamic> data =
                             doc.data()! as Map<String, dynamic>;
 
-                        // Filter out waste entries with null weights
                         List wasteEntries = data['wasteEntries'] ?? [];
                         List validWasteEntries = wasteEntries.where((entry) {
                           return entry['weight'] != null && entry['weight'] > 0;
                         }).toList();
 
                         return Card(
-                          margin: EdgeInsets.symmetric(
+                          margin: const EdgeInsets.symmetric(
                               vertical: 8.0, horizontal: 16.0),
-                          color: const Color(
-                              0xFFFFFEF8), // Set card color to hex #FFFEF8
-                          elevation: 4, // Add shadow to the card
+                          color: const Color(0xFFFFFEF8),
+                          elevation: 4,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
@@ -219,14 +213,13 @@ class _PickupReqReportState extends State<PickupReqReport> {
                       }).toList(),
                     ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Center(
                 child: ElevatedButton(
                     onPressed: selectedMonth != null ? _generatePDF : null,
                     child: Text("Download Report for $selectedMonth"),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(
-                          0xFF5FAD46), // Set your desired background color here
+                      backgroundColor: Color(0xFF5FAD46),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(18),
                       ),

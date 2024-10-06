@@ -31,10 +31,8 @@ class _PickupReqHistoryState extends State<PickupReqHistory> {
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.picture_as_pdf,
-                color: Colors.white), // Download icon
+            icon: const Icon(Icons.picture_as_pdf, color: Colors.white),
             onPressed: () {
-              // Navigate to the PickupReqReport screen
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => PickupReqReport()),
@@ -43,57 +41,51 @@ class _PickupReqHistoryState extends State<PickupReqHistory> {
           ),
         ],
         bottom: PreferredSize(
-          preferredSize:
-              const Size.fromHeight(60.0), // Set height for the bottom widget
+          preferredSize: const Size.fromHeight(60.0),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white, // Background color of the container
-                borderRadius:
-                    BorderRadius.all(Radius.circular(12)), // Rounded corners
+                color: Colors.white,
+                borderRadius: const BorderRadius.all(Radius.circular(12)),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color.fromARGB(255, 31, 31, 31)
-                        .withOpacity(0.1), // Shadow color with opacity
-                    spreadRadius: 5, // Spread radius of the shadow
-                    blurRadius: 10, // Blur radius of the shadow
-                    offset: const Offset(0, 2), // Position of the shadow
+                    color:
+                        const Color.fromARGB(255, 31, 31, 31).withOpacity(0.1),
+                    spreadRadius: 5,
+                    blurRadius: 10,
+                    offset: const Offset(0, 2),
                   ),
                 ],
               ),
               child: TextField(
                 onChanged: (value) {
                   setState(() {
-                    searchKeyword =
-                        value.toLowerCase(); // Update the search keyword
+                    searchKeyword = value.toLowerCase();
                   });
                 },
                 style: const TextStyle(
-                  color:
-                      Color.fromARGB(255, 65, 65, 65), // Set a light text color
-                  fontSize: 16, // Adjust font size
+                  color: Color.fromARGB(255, 65, 65, 65),
+                  fontSize: 16,
                   fontFamily: 'Poppins',
                   fontWeight: FontWeight.w500,
                 ),
                 decoration: const InputDecoration(
                   hintText: "Search requests",
                   hintStyle: TextStyle(
-                    color: Color.fromARGB(
-                        255, 178, 178, 178), // Light hint text color
-                    fontSize: 15, // Match hint font size with the text
+                    color: Color.fromARGB(255, 178, 178, 178),
+                    fontSize: 15,
                     fontWeight: FontWeight.w500,
-                    fontFamily: 'Poppins', // Match hint font type with the text
+                    fontFamily: 'Poppins',
                   ),
                   border: OutlineInputBorder(
-                    borderSide: BorderSide.none, // No border
-                    borderRadius: BorderRadius.all(
-                        Radius.circular(12)), // Rounded corners
+                    borderSide: BorderSide.none,
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
                   ),
                   filled: true,
-                  fillColor: Colors.white, // Fill color for the TextField
-                  contentPadding: EdgeInsets.symmetric(
-                      horizontal: 16.0, vertical: 10.0), // Padding
+                  fillColor: Colors.white,
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
                 ),
               ),
             ),
@@ -108,20 +100,18 @@ class _PickupReqHistoryState extends State<PickupReqHistory> {
           }
 
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
 
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-            return Center(child: Text('No pickup requests found.'));
+            return const Center(child: Text('No pickup requests found.'));
           }
 
-          // Filter the data based on the search keyword
           final filteredDocs =
               snapshot.data!.docs.where((DocumentSnapshot document) {
             Map<String, dynamic> data =
                 document.data()! as Map<String, dynamic>;
 
-            // Check if the search keyword matches pickupDate, pickupTime, or any wasteType in wasteEntries
             bool matchesPickupDate = (data['pickupDate'] ?? '')
                 .toLowerCase()
                 .contains(searchKeyword);
@@ -129,7 +119,6 @@ class _PickupReqHistoryState extends State<PickupReqHistory> {
                 .toLowerCase()
                 .contains(searchKeyword);
 
-            // Ensure wasteEntries is a list and check for matches
             bool matchesWasteEntries = (data['wasteEntries'] is List)
                 ? (data['wasteEntries'] as List).any((entry) {
                     return (entry['wasteType'] ?? '')
@@ -143,16 +132,16 @@ class _PickupReqHistoryState extends State<PickupReqHistory> {
                 matchesWasteEntries;
           }).toList();
 
-          // Display the filtered data in a ListView
           return ListView(
             children: filteredDocs.map((DocumentSnapshot document) {
               Map<String, dynamic> data =
                   document.data()! as Map<String, dynamic>;
 
               return Card(
-                margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                color: const Color(0xFFFFFEF8), // Set card color to hex #FFFEF8
-                elevation: 4, // Add shadow to the card
+                margin:
+                    const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                color: const Color(0xFFFFFEF8),
+                elevation: 4,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -162,39 +151,35 @@ class _PickupReqHistoryState extends State<PickupReqHistory> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Pickup Date: ${data['pickupDate'] ?? 'N/A'}", // Handle null
+                        "Pickup Date: ${data['pickupDate'] ?? 'N/A'}",
                         style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.bold,
-                          color: Color.fromARGB(
-                              255, 51, 51, 51), // Set text color to black
+                          color: Color.fromARGB(255, 51, 51, 51),
                         ),
                       ),
                       Text(
-                        "Pickup Time: ${data['pickupTime'] ?? 'N/A'}", // Handle null
+                        "Pickup Time: ${data['pickupTime'] ?? 'N/A'}",
                         style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.bold,
-                          color: Color.fromARGB(
-                              255, 67, 67, 67), // Set text color to black
+                          color: Color.fromARGB(255, 67, 67, 67),
                         ),
                       ),
                       Text(
-                        "Address: ${data['address'] ?? 'N/A'}", // Display the address
+                        "Address: ${data['address'] ?? 'N/A'}",
                         style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w400,
-                          color: Color.fromARGB(
-                              255, 105, 105, 105), // Set text color to black
+                          color: Color.fromARGB(255, 105, 105, 105),
                         ),
                       ),
-                      SizedBox(height: 10),
-                      Text(
+                      const SizedBox(height: 10),
+                      const Text(
                         "Waste Details:",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: const Color.fromARGB(
-                              255, 35, 35, 35), // Set text color to black
+                          color: Color.fromARGB(255, 35, 35, 35),
                         ),
                       ),
                       ...?data['wasteEntries']?.map<Widget>((entry) {
@@ -206,40 +191,34 @@ class _PickupReqHistoryState extends State<PickupReqHistory> {
                                 children: [
                                   Expanded(
                                     child: Text(
-                                      "${entry['wasteType'] ?? 'Unknown Waste Type'}", // Waste type
-                                      style: TextStyle(
+                                      "${entry['wasteType'] ?? 'Unknown Waste Type'}",
+                                      style: const TextStyle(
                                           fontSize: 15,
                                           fontWeight: FontWeight.w400,
-                                          color: const Color.fromARGB(
-                                              255,
-                                              105,
-                                              105,
-                                              105)), // Set text color to black
+                                          color: Color.fromARGB(
+                                              255, 105, 105, 105)),
                                     ),
                                   ),
                                   SizedBox(width: 10),
                                   Text(
-                                    "${entry['bagCount'] ?? '0'} bags", // Bag count
-                                    style: TextStyle(
+                                    "${entry['bagCount'] ?? '0'} bags",
+                                    style: const TextStyle(
                                         fontSize: 15,
                                         fontWeight: FontWeight.w400,
-                                        color: const Color.fromARGB(
-                                            255,
-                                            105,
-                                            105,
-                                            105)), // Set text color to black
+                                        color:
+                                            Color.fromARGB(255, 105, 105, 105)),
                                   ),
                                   SizedBox(width: 10),
                                   Text(
                                     entry['weight'] != null
-                                        ? "${entry['weight']} kg" // Display weight
-                                        : "Pending", // Use string "Pending" directly
+                                        ? "${entry['weight']} kg"
+                                        : "Pending",
                                     style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.w500,
                                       color: entry['weight'] != null
-                                          ? const Color.fromARGB(255, 105, 105,
-                                              105) // Set text color to gray for weight
+                                          ? const Color.fromARGB(
+                                              255, 105, 105, 105)
                                           : Colors.green,
                                     ),
                                   ),
@@ -248,14 +227,10 @@ class _PickupReqHistoryState extends State<PickupReqHistory> {
                             );
                           })?.toList() ??
                           [
-                            Text('No waste entries available',
-                                style: TextStyle(
-                                    color: Colors
-                                        .black)), // Handle null waste entries
+                            const Text('No waste entries available',
+                                style: TextStyle(color: Colors.black)),
                           ],
                       SizedBox(height: 10),
-
-                      // Add Update and Delete buttons
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -264,41 +239,37 @@ class _PickupReqHistoryState extends State<PickupReqHistory> {
                                   .any((entry) => entry['weight'] == null))
                             ElevatedButton(
                               onPressed: () {
-                                // Navigate to the pickupReqUpdate page, pass the document ID and existing data
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => PickupReqUpdate(
                                       requestId: document.id,
-                                      existingData:
-                                          data, // Pass the existing data here
+                                      existingData: data,
                                     ),
                                   ),
                                 );
                               },
                               style: ElevatedButton.styleFrom(
                                 foregroundColor: Colors.white,
-                                backgroundColor:
-                                    Color(0xFF5FAD46), // White text color
+                                backgroundColor: Color(0xFF5FAD46),
                               ),
                               child: Text("Update"),
                             ),
                           ElevatedButton(
                             onPressed: () {
-                              // Navigate to the pickupReqDelete page, pass the document ID
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => PickupReqDelete(
-                                    requestId: document.id, // Pass document ID
+                                    requestId: document.id,
                                   ),
                                 ),
                               );
                             },
                             style: ElevatedButton.styleFrom(
                               foregroundColor: Colors.white,
-                              backgroundColor: const Color.fromARGB(
-                                  255, 185, 184, 184), // White text color
+                              backgroundColor:
+                                  const Color.fromARGB(255, 185, 184, 184),
                             ),
                             child: const Text("Delete"),
                           ),
@@ -307,21 +278,18 @@ class _PickupReqHistoryState extends State<PickupReqHistory> {
                                   .any((entry) => entry['weight'] == null))
                             ElevatedButton(
                               onPressed: () {
-                                // Navigate to the QR Code generator page
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => QRCodeGenerator(
-                                      requestId: document
-                                          .id, // Pass the document ID to QR Code page if needed
+                                      requestId: document.id,
                                     ),
                                   ),
                                 );
                               },
                               style: ElevatedButton.styleFrom(
                                 foregroundColor: Colors.white,
-                                backgroundColor:
-                                    Color(0xFF5FAD46), // White text color
+                                backgroundColor: Color(0xFF5FAD46),
                               ),
                               child: Text("QR Code"),
                             ),
