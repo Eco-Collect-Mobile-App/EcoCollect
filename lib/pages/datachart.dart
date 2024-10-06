@@ -6,7 +6,9 @@ import 'package:intl/intl.dart';
 import 'package:eco_collect/user_management/models/UserModel.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:eco_collect/pages/preferences.dart';
-import 'package:pie_chart/pie_chart.dart';
+import 'package:syncfusion_flutter_charts/charts.dart' as syncfusion;
+import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:eco_collect/pages/plans.dart';
 
 class DataChart extends StatefulWidget {
   const DataChart({Key? key}) : super(key: key);
@@ -37,13 +39,13 @@ class _DataChartState extends State<DataChart> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        actions: [
-          IconButton(
-            icon: Icon(Iconsax.notification, color: Colors.white),
-            onPressed: () {
-              // Add your notification button action here
-            },
+        centerTitle: true,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(25),
           ),
+        ),
+        actions: [
           const SizedBox(width: 20),
         ],
       ),
@@ -176,150 +178,208 @@ class _DataChartState extends State<DataChart> {
                     });
                   });
 
-                  return Column(
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.2),
-                              spreadRadius: 2,
-                              blurRadius: 5,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        height: 350,
-                        width: 350,
-                        padding: const EdgeInsets.all(16),
-                        child: LineChart(
-                          LineChartData(
-                            gridData: gridData,
-                            titlesData: titlesData(dateLabels),
-                            borderData: borderData,
-                            lineBarsData: [
-                              lineChartBarData(plasticSpots, Colors.red),
-                              lineChartBarData(organicSpots, Colors.purple),
-                              lineChartBarData(recyclableSpots, Colors.green),
+                  return SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.2),
+                                spreadRadius: 2,
+                                blurRadius: 5,
+                                offset: const Offset(0, 3),
+                              ),
                             ],
-                            minX: 0,
-                            maxX: (dateLabels.length - 1).toDouble(),
-                            minY: 0,
-                            maxY: 10,
+                          ),
+                          height: 350,
+                          width: 350,
+                          padding: const EdgeInsets.all(16),
+                          child: LineChart(
+                            LineChartData(
+                              gridData: gridData,
+                              titlesData: titlesData(dateLabels),
+                              borderData: borderData,
+                              lineBarsData: [
+                                lineChartBarData(plasticSpots, Colors.red),
+                                lineChartBarData(organicSpots, Colors.purple),
+                                lineChartBarData(recyclableSpots, Colors.green),
+                              ],
+                              minX: 0,
+                              maxX: (dateLabels.length - 1).toDouble(),
+                              minY: 0,
+                              maxY: 10,
+                            ),
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 16),
-                      // Total sum boxes
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                SizedBox(
-                                  width: 160,
-                                  child: _buildTotalBox(
-                                    'Plastic',
-                                    totalPlastic,
-                                    Colors.red,
+                        const SizedBox(height: 16),
+                        // Total sum boxes
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  SizedBox(
+                                    width: 160,
+                                    child: _buildTotalBox(
+                                      'Plastic',
+                                      totalPlastic,
+                                      Colors.red,
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 160,
+                                    child: _buildTotalBox(
+                                        'Organic', totalOrganic, Colors.purple),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 10),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  SizedBox(
+                                    width: 160,
+                                    child: _buildTotalBox('Recyclable',
+                                        totalRecyclable, Colors.green),
+                                  ),
+                                  SizedBox(
+                                    width: 160,
+                                    child: _buildTotalBox(
+                                        'Other', totalOther, Colors.grey),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Pie chart to show total sums of each waste type
+                        Container(
+                          width: 350, // Set the width of the container
+                          decoration: BoxDecoration(
+                            color: Colors.white, // White background
+                            borderRadius:
+                                BorderRadius.circular(15), // Rounded corners
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black26, // Shadow color
+                                blurRadius: 10, // Blur radius
+                                offset: Offset(0, 4), // Shadow offset
+                              ),
+                            ],
+                          ),
+                          padding: EdgeInsets.all(0), // Optional: Add padding
+                          child: SfCircularChart(
+                            series: <CircularSeries>[
+                              PieSeries<Map<String, dynamic>, String>(
+                                dataSource: [
+                                  {'x': 'Plastic', 'y': totalPlastic},
+                                  {'x': 'Organic', 'y': totalOrganic},
+                                  {'x': 'Recyclable', 'y': totalRecyclable},
+                                  {'x': 'Other', 'y': totalOther},
+                                ],
+                                xValueMapper: (data, _) => data['x'] as String,
+                                yValueMapper: (data, _) => data['y'] as double,
+                                dataLabelMapper: (data, _) =>
+                                    '${data['x']}\n${data['y'].toStringAsFixed(2)} Kg', // Format for new line
+                                dataLabelSettings: DataLabelSettings(
+                                  isVisible: true,
+                                  labelPosition: ChartDataLabelPosition.outside,
+                                  connectorLineSettings: ConnectorLineSettings(
+                                    type: ConnectorType.curve,
+                                    length: '10%',
                                   ),
                                 ),
-                                SizedBox(
-                                  width: 160,
-                                  child: _buildTotalBox(
-                                      'Organic', totalOrganic, Colors.purple),
-                                ),
-                              ],
+                                pointColorMapper: (data, _) =>
+                                    data['x'] == 'Plastic'
+                                        ? Colors.red
+                                        : data['x'] == 'Organic'
+                                            ? Colors.purple
+                                            : data['x'] == 'Recyclable'
+                                                ? Colors.green
+                                                : Colors.grey,
+                              ),
+                            ],
+                            title: ChartTitle(
+                              text: 'Waste Composition for $_selectedPeriod',
+                              textStyle: TextStyle(fontWeight: FontWeight.bold),
                             ),
-                            const SizedBox(height: 10),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                SizedBox(
-                                  width: 160,
-                                  child: _buildTotalBox('Recyclable',
-                                      totalRecyclable, Colors.green),
-                                ),
-                                SizedBox(
-                                  width: 160,
-                                  child: _buildTotalBox(
-                                      'Other', totalOther, Colors.grey),
-                                ),
-                              ],
+                            legend: syncfusion.Legend(
+                              // Use the alias here
+                              isVisible: true,
+                              itemPadding:
+                                  5, // Adjust padding between legend items
+                              overflowMode: syncfusion.LegendItemOverflowMode
+                                  .wrap, // Wrap items if they overflow
+                              position: syncfusion
+                                  .LegendPosition.bottom, // Use the alias
                             ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      // Pie chart to show total sums of each waste type
-                      /*PieChart(
-                        dataMap: {
-                          "Plastic": totalPlastic,
-                          "Organic": totalOrganic,
-                          "Recyclable": totalRecyclable,
-                          "Other": totalOther,
-                        },
-                        animationDuration: const Duration(milliseconds: 800),
-                        chartLegendSpacing: 32,
-                        chartRadius: MediaQuery.of(context).size.width / 3,
-                        colorList: [
-                          Colors.red, // Plastic
-                          Colors.purple, // Organic
-                          Colors.green, // Recyclable
-                          Colors.grey, // Other
-                        ],
-                        initialAngleInDegree: 0,
-                        chartType: ChartType.disc,
-                        legendOptions: const LegendOptions(
-                          showLegendsInRow: false,
-                          legendPosition: LegendPosition.right,
-                          showLegends: true,
-                          legendTextStyle: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 14),
-                        ),
-                        chartValuesOptions: const ChartValuesOptions(
-                          showChartValueBackground: false,
-                          showChartValues: true,
-                          chartValueStyle: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14),
-                        ),
-                      ), */
-
-                      const SizedBox(height: 16),
-
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF5FAD46),
-                          shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(10), // Rounded corners
+                            tooltipBehavior: TooltipBehavior(enable: true),
                           ),
                         ),
-                        onPressed: () async {
-                          final selectedGoals = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => UserGoals(),
-                            ),
-                          );
 
-                          if (selectedGoals != null &&
-                              selectedGoals is List<String>) {
-                            print('Selected Goals: $selectedGoals');
-                          }
-                        },
-                        child: const Text(
-                          'Generate your waste management plan',
-                          style: TextStyle(color: Colors.white),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF5FAD46),
+                            shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.circular(10), // Rounded corners
+                            ),
+                          ),
+                          onPressed: () async {
+                            final selectedGoals = await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => UserGoals(),
+                              ),
+                            );
+
+                            if (selectedGoals != null &&
+                                selectedGoals is List<String>) {
+                              print('Selected Goals: $selectedGoals');
+                            }
+                          },
+                          child: const Text(
+                            'Generate a waste management plan',
+                            style: TextStyle(color: Colors.white),
+                          ),
                         ),
-                      ),
-                    ],
+
+                        const SizedBox(height: 16), // Spacing between buttons
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF5FAD46),
+                            shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.circular(10), // Rounded corners
+                            ),
+                          ),
+                          onPressed: () {
+                            // Navigate to the Plans screen
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => WastePlans(),
+                              ),
+                            );
+                          },
+                          child: const Text(
+                            'View Saved Plans',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                        const SizedBox(height: 16), // Spacing between buttons
+                      ],
+                    ),
                   );
                 },
               ),
@@ -414,7 +474,7 @@ class _DataChartState extends State<DataChart> {
   }
 
   // Line chart grid data
-  FlGridData get gridData => FlGridData(show: true);
+  FlGridData get gridData => FlGridData(show: false);
 
   // Line chart border data
   FlBorderData get borderData => FlBorderData(
