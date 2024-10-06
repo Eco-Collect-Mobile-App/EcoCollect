@@ -31,6 +31,9 @@ dependencies:
   pdf: ^3.8.4
   printing: ^5.13.3
   flutter_ui_widgets: ^1.0.2
+  pdf: ^3.11.1
+  printing: ^5.13.3
+  open_file: ^3.5.8
   syncfusion_flutter_charts: ^27.1.51
 
 dev_dependencies:
