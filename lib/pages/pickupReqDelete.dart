@@ -11,15 +11,11 @@ class PickupReqDelete extends StatelessWidget {
 
   Future<void> _confirmDeletion(BuildContext context) async {
     try {
-      // Call the delete function from FirebaseService
       await _firebaseService.deleteWasteRequest(requestId);
-
-      // Show a SnackBar with a success message
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Request deleted successfully')),
       );
 
-      // Navigate to PickupReqHistory after deletion
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) => PickupReqHistory(),
@@ -46,16 +42,16 @@ class PickupReqDelete extends StatelessWidget {
         centerTitle: true,
       ),
       body: Container(
-        color: Color(0xFFE7EBE8), // Set background color to #E7EBE8
+        color: Color(0xFFE7EBE8),
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
               decoration: BoxDecoration(
-                color: Color(0xFFFFFEF8), // Set box color to #FFFEF8
+                color: Color(0xFFFFFEF8),
                 borderRadius: BorderRadius.circular(10),
-                boxShadow: [
+                boxShadow: const [
                   BoxShadow(
                     color: Colors.black26,
                     blurRadius: 4,
@@ -74,7 +70,7 @@ class PickupReqDelete extends StatelessWidget {
                         fontWeight: FontWeight.w700,
                         fontSize: 17),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   FutureBuilder<DocumentSnapshot>(
                     future: FirebaseFirestore.instance
                         .collection('wasteData')
@@ -86,10 +82,9 @@ class PickupReqDelete extends StatelessWidget {
                         return Center(child: Text('Error: ${snapshot.error}'));
                       }
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Center(child: CircularProgressIndicator());
+                        return const Center(child: CircularProgressIndicator());
                       }
 
-                      // If the request exists, show its details
                       if (snapshot.data != null && snapshot.data!.exists) {
                         Map<String, dynamic> data =
                             snapshot.data!.data() as Map<String, dynamic>;
@@ -98,8 +93,8 @@ class PickupReqDelete extends StatelessWidget {
                           children: [
                             Text("Pickup Date: ${data['pickupDate']}"),
                             Text("Pickup Time: ${data['pickupTime']}"),
-                            SizedBox(height: 10),
-                            Text("Waste Entries:"),
+                            const SizedBox(height: 10),
+                            const Text("Waste Entries:"),
                             ...data['wasteEntries'].map<Widget>((entry) {
                               return Padding(
                                 padding:
@@ -111,29 +106,28 @@ class PickupReqDelete extends StatelessWidget {
                           ],
                         );
                       } else {
-                        return Center(child: Text('Request not found.'));
+                        return const Center(child: Text('Request not found.'));
                       }
                     },
                   ),
                 ],
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Center(
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      Color(0xFF5FAD46), // Button color set to green
-                  padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                  backgroundColor: Color(0xFF5FAD46),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
                 ),
                 onPressed: () => _confirmDeletion(context),
-                child: Text(
+                child: const Text(
                   'Confirm Deletion',
                   style: TextStyle(
                       color: Colors.white,
                       fontSize: 17,
-                      fontWeight:
-                          FontWeight.w600), // Button text color set to white
+                      fontWeight: FontWeight.w600),
                 ),
               ),
             ),

@@ -26,6 +26,7 @@ packages:
     source: hosted
     version: "3.6.1"
 
+
   args:
     dependency: transitive
     description:
@@ -59,6 +60,15 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.8"
+  bidi:
+    dependency: transitive
+    description:
+      name: bidi
+      sha256: "9a712c7ddf708f7c41b1923aa83648a3ed44cfd75b04f72d598c45e5be287f9d"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.12"
+
   boolean_selector:
     dependency: transitive
     description:
@@ -132,6 +142,7 @@ packages:
     source: hosted
     version: "1.18.0"
 
+
   convert:
     dependency: transitive
     description:
@@ -148,6 +159,7 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.5"
+
 
   crypto_keys:
     dependency: transitive
@@ -358,6 +370,7 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.6.6"
+
   google_generative_ai:
     dependency: "direct main"
     description:
@@ -396,6 +409,10 @@ packages:
     dependency: transitive
     description:
       name: image
+      sha256: "2237616a36c0d69aef7549ab439b833fb7f9fb9fc861af2cc9ac3eedddd69ca8"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.2.0"
       sha256: "8e9d133755c3e84c73288363e6343157c383a0c6c56fc51afcc5d4d7180306d6"
       url: "https://pub.dev"
     source: hosted
@@ -513,6 +530,70 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.0"
+  open_file:
+    dependency: "direct main"
+    description:
+      name: open_file
+      sha256: "2b7dad19db5fd553f9c04e5113a1853e70ed4768e1126e806541307f5964af53"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.5.8"
+  open_file_android:
+    dependency: transitive
+    description:
+      name: open_file_android
+      sha256: c29d96112e5092e4871e292b73f71ecf35f262364b11553852a16f36475fe5e0
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.5"
+  open_file_ios:
+    dependency: transitive
+    description:
+      name: open_file_ios
+      sha256: "8d9c03495cf14ca70bdbf191894b822ba3b2629cc0046ee311cbbe504db66c44"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.2"
+  open_file_linux:
+    dependency: transitive
+    description:
+      name: open_file_linux
+      sha256: cd2088722048b9c40f8615c6d83005fe0726e0e447e9cdfb40c2b65477291f7d
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.4"
+  open_file_mac:
+    dependency: transitive
+    description:
+      name: open_file_mac
+      sha256: "9d809f528cccc6dc9390caf50893eae9a6944e0f3b8a2558c7ad19e91c9244a1"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.1"
+  open_file_platform_interface:
+    dependency: transitive
+    description:
+      name: open_file_platform_interface
+      sha256: "14c50efb1a9667cb96e4fa68d601e6ad348fe337b02789834029b37ae3631498"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.2"
+  open_file_web:
+    dependency: transitive
+    description:
+      name: open_file_web
+      sha256: cfc9d6091a844e305a3698c45f47f5cd88aabb143665dcfb0f5fd6f7524d357e
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.3"
+  open_file_windows:
+    dependency: transitive
+    description:
+      name: open_file_windows
+      sha256: "2f4318d2d3958ec8d63b6dd4430c15b1fcb2fe7a2113e83c734584501a5c6d81"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.2"
   openid_client:
     dependency: transitive
     description:
@@ -597,6 +678,19 @@ packages:
     dependency: "direct main"
     description:
       name: pdf
+      sha256: "05df53f8791587402493ac97b9869d3824eccbc77d97855f4545cf72df3cae07"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.11.1"
+  pdf_widget_wrapper:
+    dependency: transitive
+    description:
+      name: pdf_widget_wrapper
+      sha256: c930860d987213a3d58c7ec3b7ecf8085c3897f773e8dc23da9cae60a5d6d0f5
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.4"
+
       sha256: "10659b915e65832b106f6d1d213e09b789cc1f24bf282ee911e49db35b96be4d"
       url: "https://pub.dev"
     source: hosted
@@ -657,6 +751,7 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.0.2"
+
   pie_chart:
     dependency: "direct main"
     description:
@@ -681,6 +776,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.8"
+  printing:
+    dependency: "direct main"
+    description:
+      name: printing
+      sha256: b576764370c920b510cedf3eac7dc199d6d4af34336d608e97546392c0113362
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.13.3"
   pointycastle:
     dependency: transitive
     description:
@@ -895,6 +998,7 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.5.0"
+
   yaml:
     dependency: transitive
     description:
