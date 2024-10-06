@@ -1,4 +1,5 @@
 import 'package:eco_collect/pages/complaints.dart';
+import 'package:eco_collect/pages/complaints_home.dart';
 import 'package:eco_collect/pages/plans.dart';
 import 'package:eco_collect/pages/profile.dart';
 import 'package:eco_collect/pages/dashboard.dart';
@@ -73,6 +74,9 @@ class NavigationController extends GetxController {
   final screens = [
     PickupRequest(),
     PickupReqHistory(),
+    const DataChart(),
+    const ComplaintsHome(),
+    const Dashboard(),
     const DataChart(),
     WastePlans(),
     Profile(),
