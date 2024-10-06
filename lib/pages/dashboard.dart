@@ -71,9 +71,15 @@ class _DashboardState extends State<Dashboard> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: wasteEntries.map((entry) {
                         String wasteType = entry['wasteType'];
-                        int bagCount = entry['bagCount'];
-                        var weight =
-                            entry['weight'] ?? 'N/A'; // Handle null weight
+
+                        // Safely convert bagCount to an integer
+                        int bagCount =
+                            int.tryParse(entry['bagCount'].toString()) ?? 0;
+
+                        // Handle weight, ensuring it's a string
+                        var weight = entry['weight'] != null
+                            ? entry['weight'].toString()
+                            : 'N/A';
 
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 4.0),
