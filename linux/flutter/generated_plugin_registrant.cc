@@ -6,7 +6,6 @@
 
 #include "generated_plugin_registrant.h"
 
-
 #include <open_file_linux/open_file_linux_plugin.h>
 #include <printing/printing_plugin.h>
 

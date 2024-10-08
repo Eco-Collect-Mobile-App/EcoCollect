@@ -28,8 +28,7 @@ dependencies:
   google_generative_ai: ^0.4.6
   flutter_markdown: ^0.7.3+2
   pie_chart: ^5.4.0
-  pdf: ^3.8.4
-  printing: ^5.13.3
+  # pdf: ^3.8.4
   flutter_ui_widgets: ^1.0.2
   pdf: ^3.11.1
   printing: ^5.13.3
